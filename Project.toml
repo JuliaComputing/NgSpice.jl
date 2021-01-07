@@ -1,0 +1,16 @@
+name = "Ngspice"
+uuid = "1a64e563-3ad9-44a2-8713-a1728bea8a90"
+authors = ["Venkateshprasad Bhat"]
+version = "0.1.0"
+
+[deps]
+ngspice_jll = "57e080ce-e004-5ece-a144-c95753423b2a"
+
+[compat]
+julia = "1.5"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
