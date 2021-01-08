@@ -1,8 +1,4 @@
-# Automatically generated using Clang.jl
-
-
 # Skipping MacroDefinition: IMPEXP __declspec ( dllimport )
-
 struct ngcomplex
     cx_real::Cdouble
     cx_imag::Cdouble
@@ -63,10 +59,24 @@ const pvecinfoall = Ptr{vecinfoall}
 const BGThreadRunning = Cvoid
 
 #=Function pointers skipped by the generator
-# Function definition is broken as it returns nothing while expected to return Cint
 
-function sendchar()::Cint end
+SendChar       typedef of callback function for reading printf, fprintf, fputs
+SendStat       typedef of callback function for reading status string and precent value
+ControlledExit typedef of callback function for tranferring a signal upon
+               ngspice controlled_exit to caller. May be used by caller
+               to detach ngspice.dll.
+SendData       typedef of callback function for sending an array of structs containing
+               data values of all vectors in the current plot (simulation output)
+SendInitData   typedef of callback function for sending an array of structs containing info on
+               all vectors in the current plot (immediately before simulation starts)
+BGThreadRunning typedef of callback function for sending a boolean signal (true if thread
+                is running)
 
+# SendStat "points to function ∈ ["agauss", "gauss", "aunif", "unif", "limit"]
+
+#TODO Function definitions
+function sendchar(Ptr{Cchar}, Cint, Ptr{Cvoid})::Cint end
+SendChar = @cfunction(sendchar, Cint, (Ptr{Char}, Cint, Ptr{Cvoid}))
 
 function sendstat(Ptr{Cchar}, Cint, Ptr{Cvoid})::Cint end
 SendStat = @cfunction(sendstat, Cint, (Ptr{Char}, Cint, Ptr{Cvoid}))
