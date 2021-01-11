@@ -6,4 +6,4 @@
 [![Coverage](https://codecov.io/gh/JuliaComputing/Ngspice.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaComputing/Ngspice.jl)
 
 
-This repository provides a Julia wraper for Ngspice library.
+[WIP] This repository provides a Julia wrapper for Ngspice library.
