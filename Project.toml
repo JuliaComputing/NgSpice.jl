@@ -8,6 +8,7 @@ CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 ngspice_jll = "57e080ce-e004-5ece-a144-c95753423b2a"
 
 [compat]
+CEnum = "0.4"
 julia = "1.5"
 
 [extras]
