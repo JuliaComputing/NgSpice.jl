@@ -1,3 +1,4 @@
+__precompile__()
 module Ngspice
 
 using ngspice_jll
@@ -23,8 +24,11 @@ export Ctm, Ctime_t, Cclock_t
 include("ngspice_common.jl")
 include("ngspice_api.jl")
 
+export BGThreadRunning, GetISRCData, GetSyncData, GetVSRCData, 
+       SendChar, SendData, SendStat, SendInitData
+
 foreach(names(@__MODULE__, all=true)) do s
-    if startswith(string(s), "ngspice_")
+    if startswith(string(s), "ng")
         @eval export $s
     end
 end

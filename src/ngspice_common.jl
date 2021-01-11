@@ -56,8 +56,6 @@ end
 
 const pvecinfoall = Ptr{vecinfoall}
 
-const BGThreadRunning = Cvoid
-
 #=Function pointers skipped by the generator
 
 SendChar       typedef of callback function for reading printf, fprintf, fputs
@@ -71,31 +69,55 @@ SendInitData   typedef of callback function for sending an array of structs cont
                all vectors in the current plot (immediately before simulation starts)
 BGThreadRunning typedef of callback function for sending a boolean signal (true if thread
                 is running)
-
-# SendStat "points to function ∈ ["agauss", "gauss", "aunif", "unif", "limit"]
-
-#TODO Function definitions
-function sendchar(Ptr{Cchar}, Cint, Ptr{Cvoid})::Cint end
-SendChar = @cfunction(sendchar, Cint, (Ptr{Char}, Cint, Ptr{Cvoid}))
-
-function sendstat(Ptr{Cchar}, Cint, Ptr{Cvoid})::Cint end
-SendStat = @cfunction(sendstat, Cint, (Ptr{Char}, Cint, Ptr{Cvoid}))
-
-function controlledexit(Cint, Cint, Cint, Cint, Ptr{Cvoid}):Cint end
-ControlledExit = @cfunction(controlledexit, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid}))
-
-function senddata(Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid})::Cint end
-SendData = @cfunction(senddata, Cint, (Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid}))
-
-function sendinitdata(sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid})::Cint end
-SendInitData = @cfunction(sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
-
-function getvsrcdata(Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})::Cint end
-GetVSRCData = @cfunction(getvsrcdata, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))
-
-function getisrcdata(Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})::Cint end
-GetISRCData = @cfunction(getisrcdata, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))
-
-function getsyncdata(Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})::Cint end
-GetSyncData = @cfunction(getsyncdata, Cint, (Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid}))
 =#
+
+const SendChar = Cvoid
+const SendStat = Cvoid
+const ControlledExit  = Cvoid
+const SendData     = Cvoid
+const SendInitData = Cvoid
+const BGThreadRunning = Cvoid
+const GetVSRCData  = Cvoid
+const GetISRCData  = Cvoid
+const GetSyncData = Cvoid
+
+const FnTypeSignatures = Dict(
+    :SendChar     => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
+    :SendStat     => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
+    :ControlledExit  => (:Cint, :((Cint, Cint, Cint, Cint, Ptr{Cvoid}))),
+    :SendData     => (:Cint, :((Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid}))),
+    :SendInitData => (:Cint, :((Ptr{vecinfoall}, Cint, Ptr{Cvoid}))),
+    :BGThreadRunning => (:Cint, :((Cint, Cint, Ptr{Cvoid}))),
+    :GetVSRCData  => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
+    :GetISRCData  => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
+    :GetSyncData  => (:Cint, :((Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})))
+)
+
+SendChar_wrapper(fp::SendChar) = fp
+SendChar_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
+
+SendStat_wrapper(fp::SendStat) = fp
+SendStat_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
+
+ContolledExit_wrapper(fp::ControlledExit) = fp
+ContolledExit_wrapper(f) = @cfunction($f, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid})).ptr
+
+SendData_wrapper(fp::SendData) = fp
+SendData_wrapper(f) = @cfunction($f, Cint, (Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid})).ptr
+
+SendInitData_wrapper(fp::SendInitData) = fp
+SendInitData_wrapper(f) = @cfunction($f, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid})).ptr
+
+BGThreadRunning_wrapper(fp::BGThreadRunning) = fp
+BGThreadRunning_wrapper(f) = @cfunction($f, Cint, (Cint, Cint, Ptr{Cvoid})).ptr
+
+GetVSRCData_wrapper(fp::GetVSRCData) = fp
+GetVSRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})).ptr
+
+
+GetISRCData_wrapper(fp::GetISRCData) = fp
+GetISRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})).ptr
+
+
+GetSyncData_wrapper(fp::GetSyncData) = fp
+GetSyncData_wrapper(f) = @cfunction($f, Cint, (Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})).ptr
