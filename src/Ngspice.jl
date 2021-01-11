@@ -18,11 +18,11 @@ end=#
 
 using CEnum
 
-include("ctypes.jl")
+include("interface/ctypes.jl")
 export Ctm, Ctime_t, Cclock_t
 
-include("ngspice_common.jl")
-include("ngspice_api.jl")
+include("interface/ngspice_common.jl")
+include("interface/ngspice_api.jl")
 
 export BGThreadRunning, GetISRCData, GetSyncData, GetVSRCData, 
        SendChar, SendData, SendStat, SendInitData
@@ -33,5 +33,10 @@ foreach(names(@__MODULE__, all=true)) do s
     end
 end
 
+include("API/running.jl")
+include("API/plots.jl")
+include("API/netlist.jl")
+
+export halt, init, isrunning, reset, run, start, stop
 
 end
