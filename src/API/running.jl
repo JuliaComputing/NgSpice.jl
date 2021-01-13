@@ -1,9 +1,8 @@
-using Ngspice
+fpgen(a, fp) = (a=a; convert(Ptr{fp}, a))
 
 _command(cmd::Symbol) = (ngSpice_Command(cmd))
-# define a validate function to validatethe cmd before f call                  
 
-init()      = (p = fpgen(0, Nothing); ngSpice_Init(p,p,p,p,p,p,p))
+init()      = (p = convert(Ptr{Nothing}, 0); ngSpice_Init(p,p,p,p,p,p,p))
 
 isrunning() = ngSpice_running()
 
@@ -14,5 +13,3 @@ halt()      = _command(:bg_halt)
 stop()      = _command(:bg_halt) # is it necessary?
 
 reset()     = _command(:reset)
-
-

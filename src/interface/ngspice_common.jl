@@ -1,18 +1,18 @@
 # Skipping MacroDefinition: IMPEXP __declspec ( dllimport )
 struct ngcomplex
-    cx_real::Cdouble
-    cx_imag::Cdouble
+    real::Cdouble
+    imag::Cdouble
 end
 
 const ngcomplex_t = ngcomplex
 
 struct vector_info
-    v_name::Cstring
-    v_type::Cint
-    v_flags::Int16
-    v_realdata::Ptr{Cdouble}
-    v_compdata::Ptr{ngcomplex_t}
-    v_length::Cint
+    name::Cstring
+    type::Cint
+    flags::Int16
+    realdata::Ptr{Cdouble}
+    compdata::Ptr{ngcomplex_t}
+    length::Cint
 end
 
 const pvector_info = Ptr{vector_info}
@@ -82,15 +82,15 @@ const GetISRCData  = Cvoid
 const GetSyncData = Cvoid
 
 const FnTypeSignatures = Dict(
-    :SendChar     => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
-    :SendStat     => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
+    :SendChar        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
+    :SendStat        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
     :ControlledExit  => (:Cint, :((Cint, Cint, Cint, Cint, Ptr{Cvoid}))),
-    :SendData     => (:Cint, :((Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid}))),
-    :SendInitData => (:Cint, :((Ptr{vecinfoall}, Cint, Ptr{Cvoid}))),
+    :SendData        => (:Cint, :((Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid}))),
+    :SendInitData    => (:Cint, :((Ptr{vecinfoall}, Cint, Ptr{Cvoid}))),
     :BGThreadRunning => (:Cint, :((Cint, Cint, Ptr{Cvoid}))),
-    :GetVSRCData  => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
-    :GetISRCData  => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
-    :GetSyncData  => (:Cint, :((Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})))
+    :GetVSRCData     => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
+    :GetISRCData     => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
+    :GetSyncData     => (:Cint, :((Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})))
 )
 
 SendChar_wrapper(fp::SendChar) = fp
@@ -98,7 +98,7 @@ SendChar_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
 
 SendStat_wrapper(fp::SendStat) = fp
 SendStat_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
-
+ 
 ContolledExit_wrapper(fp::ControlledExit) = fp
 ContolledExit_wrapper(f) = @cfunction($f, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid})).ptr
 
@@ -121,3 +121,24 @@ GetISRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}
 
 GetSyncData_wrapper(fp::GetSyncData) = fp
 GetSyncData_wrapper(f) = @cfunction($f, Cint, (Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})).ptr
+
+function SendChar(text::String, id::Int32, userdata)
+    println("SPICE : $text" )
+end
+
+sendchar = @cfunction($SendChar, Cint, (Cstring, Cint, Ptr{Cvoid}))
+
+function SendStat(text::String, id::Int32, userdata)
+   
+    println("SPICE : $text" )
+    return 0
+end
+
+sendstat = @cfunction($SendStat, Cint, (Cstring, Cint, Ptr{Cvoid}))
+
+function SendInitData(pvia::Ptr{vecinfoall}, id, ptr)
+
+    println(pvia)
+    return 0
+end
+sendinitdata = @cfunction($SendInitData, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))

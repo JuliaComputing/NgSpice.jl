@@ -16,7 +16,7 @@ function __init__()
     check_deps()
 end=#
 
-using CEnum
+#using CEnum
 
 include("interface/ctypes.jl")
 export Ctm, Ctime_t, Cclock_t
@@ -33,10 +33,14 @@ foreach(names(@__MODULE__, all=true)) do s
     end
 end
 
-include("API/running.jl")
-include("API/plots.jl")
+include("API/get_vector.jl")
 include("API/netlist.jl")
+include("API/plots.jl")
+include("API/running.jl")
 
+export get_vector, load_netlist, load_netlist
 export halt, init, isrunning, reset, run, start, stop
 
 end
+
+
