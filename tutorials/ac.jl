@@ -1,7 +1,6 @@
 #This simulates the ac_ascii file
 
-joinpath(@__DIR__, "..", "src/Ngspice.jl") |> normpath |> include
-n = Ngspice
+import Ngspice as n
 netpath = joinpath(@__DIR__, "..", "inputs/RC2.net") |> normpath
 
 n.load_netlist(netpath)

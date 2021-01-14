@@ -1,11 +1,17 @@
 function get_vector(vecname)
-    vec  = n.ngGet_Vec_Info(vecname)
-    vec != convert(Ptr{Nothing}, 0) || throw("Points to null")
-    vname  = unsafe_load(convert(Ptr{UInt8}, vec.name))
-    vreal  = unsafe_load(vec.realdata)
-    _cmp = unsafe_load(vec.compdata)
-    vcmplx = Complex(_cmp.real, _cmp.imag)
-    return vname, vreal, vcmplx
+    vec = ngGet_Vec_Info(vecname)
+    vec != C_NULL || throw("Vector $(vecname) not found")
+    vecinfo = unsafe_load(vec)
+    vname  = unsafe_string(vecinfo.name)
+    if (vecinfo.flags & VF_REAL) != 0
+        vreal = copy(unsafe_wrap(Array, vecinfo.realdata, (vecinfo.length,)))
+        return vname, vreal
+    elseif (vecinfo.flags & VF_COMPLEX) != 0
+        vcomplex = copy(unsafe_wrap(Array, vecinfo.realdata, (vecinfo.length,)))
+        return vname, vcmplx
+    else
+        error("Unknown vector type")
+    end
 end
 
 #=

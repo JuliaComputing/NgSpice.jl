@@ -1,10 +1,14 @@
 # Skipping MacroDefinition: IMPEXP __declspec ( dllimport )
-struct ngcomplex
-    real::Cdouble
-    imag::Cdouble
-end
+const ngcomplex_t = Complex{Cdouble}
 
-const ngcomplex_t = ngcomplex
+const VF_REAL = (1 << 0)
+const VF_COMPLEX = (1 << 1)
+const VF_ACCUM = (1 << 2)
+const VF_PLOT = (1 << 3)
+const VF_PRINT = (1 << 4)
+const VF_MINGIVEN = (1 << 5)
+const VF_MAXGIVEN = (1 << 6)
+const VF_PERMANENT = (1 << 7)
 
 struct vector_info
     name::Cstring
@@ -71,16 +75,6 @@ BGThreadRunning typedef of callback function for sending a boolean signal (true 
                 is running)
 =#
 
-const SendChar = Cvoid
-const SendStat = Cvoid
-const ControlledExit  = Cvoid
-const SendData     = Cvoid
-const SendInitData = Cvoid
-const BGThreadRunning = Cvoid
-const GetVSRCData  = Cvoid
-const GetISRCData  = Cvoid
-const GetSyncData = Cvoid
-
 const FnTypeSignatures = Dict(
     :SendChar        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
     :SendStat        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
@@ -93,33 +87,33 @@ const FnTypeSignatures = Dict(
     :GetSyncData     => (:Cint, :((Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})))
 )
 
-SendChar_wrapper(fp::SendChar) = fp
+SendChar_wrapper(fp::Ptr{Cvoid}) = fp
 SendChar_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
 
-SendStat_wrapper(fp::SendStat) = fp
+SendStat_wrapper(fp::Ptr{Cvoid}) = fp
 SendStat_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
- 
-ContolledExit_wrapper(fp::ControlledExit) = fp
+
+ContolledExit_wrapper(fp::Ptr{Cvoid}) = fp
 ContolledExit_wrapper(f) = @cfunction($f, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid})).ptr
 
-SendData_wrapper(fp::SendData) = fp
+SendData_wrapper(fp::Ptr{Cvoid}) = fp
 SendData_wrapper(f) = @cfunction($f, Cint, (Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid})).ptr
 
-SendInitData_wrapper(fp::SendInitData) = fp
+SendInitData_wrapper(fp::Ptr{Cvoid}) = fp
 SendInitData_wrapper(f) = @cfunction($f, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid})).ptr
 
-BGThreadRunning_wrapper(fp::BGThreadRunning) = fp
+BGThreadRunning_wrapper(fp::Ptr{Cvoid}) = fp
 BGThreadRunning_wrapper(f) = @cfunction($f, Cint, (Cint, Cint, Ptr{Cvoid})).ptr
 
-GetVSRCData_wrapper(fp::GetVSRCData) = fp
+GetVSRCData_wrapper(fp::Ptr{Cvoid}) = fp
 GetVSRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})).ptr
 
 
-GetISRCData_wrapper(fp::GetISRCData) = fp
+GetISRCData_wrapper(fp::Ptr{Cvoid}) = fp
 GetISRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})).ptr
 
 
-GetSyncData_wrapper(fp::GetSyncData) = fp
+GetSyncData_wrapper(fp::Ptr{Cvoid}) = fp
 GetSyncData_wrapper(f) = @cfunction($f, Cint, (Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})).ptr
 
 function SendChar(text::String, id::Int32, userdata)
@@ -129,7 +123,7 @@ end
 sendchar = @cfunction($SendChar, Cint, (Cstring, Cint, Ptr{Cvoid}))
 
 function SendStat(text::String, id::Int32, userdata)
-   
+
     println("SPICE : $text" )
     return 0
 end
