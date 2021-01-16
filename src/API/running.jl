@@ -1,15 +1,16 @@
-command(cmd::Symbol) = ngSpice_Command(cmd)
+cmd(command) = ngSpice_Command(command) #should typeof(command) be restricted
 
-init()      = ngSpice_Init(sendcharptr, sendstatptr, controlledexitptr, 
-                senddataptr, sendinitdataptr, bgthreadptr, Ptr{Cvoid})
+init()      = (pvoid = convert(Ptr{Nothing}, 0); 
+                ngSpice_Init(psendchar, psendstat, pcontrolledexit, 
+                psenddata, psendinitdata, pbgthread, pvoid))
 
 isrunning() = ngSpice_running()
 
-run()       = (init(); command(:run))
-bgrun()     = (init(); command(:bg_run))
+simrun()    = (init(); cmd(:run))
+bgrun()     = (init(); cmd(:bg_run))
 
-halt()      = command(:bg_halt)
-bghalt()    = command(:bg_halt) 
+simhalt()   = cmd(:halt)
+bghalt()    = cmd(:bg_halt) 
 
-reset()     = command(:reset)
+reset()     = cmd(:reset)
 

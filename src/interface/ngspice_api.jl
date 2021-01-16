@@ -4,7 +4,7 @@ end
 
 function ngSpice_Init_Sync(vsrcdat, isrcdat, syncdat, ident, userData)
     ccall((:ngSpice_Init_Sync, libngspice), Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cint}, Ptr{Cvoid}), vsrcdat, isrcdat, syncdat, ident, userData)
-end #Julia crashes
+end 
 
 function ngSpice_Command(command)
     ccall((:ngSpice_Command, libngspice), Cint, (Cstring,), command)
@@ -16,7 +16,7 @@ end
 
 function ngSpice_Circ(circarray)
     ccall((:ngSpice_Circ, libngspice), Cint, (Ptr{Ptr{UInt8}},), circarray)
-end #unsafe_convert between ::Type{Ptr{Cstring}}, ::Type{Ptr{String}} needs to be added
+end 
 
 function ngSpice_CurPlot()
     ccall((:ngSpice_CurPlot, libngspice), Ptr{UInt8}, ())

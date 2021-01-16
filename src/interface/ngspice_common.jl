@@ -60,18 +60,18 @@ end
 
 const pvecinfoall = Ptr{vecinfoall}
 
-ngerror, bgrunning, vecgetnum = 0, 0, 0
+ngerrorf, bgrunningf, vecgetnum = 0, 0, 0
 
 function sendchar(_text::Ptr{Cchar}, id::Int32, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
     println("SPICE STATUS : $text" )
-    occursin(r"stderr Error:"i, text) && (ngerror = 1)
+    occursin(r"stderr Error:"i, text) && (ngerrorf = 1)
     return 0
 end
 
-gen_sendcharptr() = @cfunction($sendchar, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
-sendcharptr       = gen_sendcharptr()
+gen_psendchar() = @cfunction($sendchar, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
+psendchar       = gen_psendchar()
 
 function sendstat(_text::Ptr{Cchar}, id::Int32, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
@@ -80,8 +80,8 @@ function sendstat(_text::Ptr{Cchar}, id::Int32, userdata)::Cint
     return 0
 end
 
-gen_sendstatptr() = @cfunction($sendstat, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
-sendstatptr       = gen_sendstatptr()
+gen_psendstat() = @cfunction($sendstat, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
+psendstat       = gen_psendstat()
 
 function bgthreadrunning(run::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
     bgrunning = run
@@ -90,8 +90,8 @@ function bgthreadrunning(run::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
     return 0
 end
 
-gen_bgthreadptr() = @cfunction($bgthreadrunning, Cint, (Cint, Cint, Ptr{Cvoid}))
-bgthreadptr       = gen_bgthreadptr()
+gen_pbgthread() = @cfunction($bgthreadrunning, Cint, (Cint, Cint, Ptr{Cvoid}))
+pbgthread       = gen_pbgthread()
 
 function controlledexit(exitstatus::Cint, immediate::Cint, 
     quitexit::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
@@ -101,8 +101,8 @@ function controlledexit(exitstatus::Cint, immediate::Cint,
     return exitstatus
 end
 
-get_controlledexitptr() = @cfunction($controlledexit, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid}))
-controlledexitptr       = get_controlledexitptr() 
+gen_pcontrolledexit() = @cfunction($controlledexit, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid}))
+pcontrolledexit       = gen_pcontrolledexit() 
 
 
 function senddata(vecdata::Ptr{vecvaluesall}, novecs::Cint, 
@@ -115,8 +115,8 @@ function senddata(vecdata::Ptr{vecvaluesall}, novecs::Cint,
     return 0
 end
 
-get_senddataptr = @cfunction($sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
-senddataptr     = get_senddataptr() 
+gen_psenddata() = @cfunction($senddata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
+psenddata       = gen_psenddata() 
 
 function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
     for i in range(1, stop=initdata.veccount)
@@ -126,8 +126,8 @@ function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
     return 0
 end
 
-get_sendinitdataptr = @cfunction($sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
-sendinitdataptr     = get_sendinitdataptr() 
+gen_psendinitdata() = @cfunction($sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
+psendinitdata       = gen_psendinitdata() 
 
 #### TBD: Do we still need these `_wrappers` and `FnTypeSignatures`?
 #=const FnTypeSignatures = Dict(
@@ -143,24 +143,15 @@ sendinitdataptr     = get_sendinitdataptr()
 )
 
 SendChar_wrapper(fp::Ptr{Cvoid}) = fp
-SendChar_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
-
 SendStat_wrapper(fp::Ptr{Cvoid}) = fp
-SendStat_wrapper(f) = @cfunction($f, Cint, (Ptr{Char}, Cint, Ptr{Cvoid})).ptr
-
 ContolledExit_wrapper(fp::Ptr{Cvoid}) = fp
-ContolledExit_wrapper(f) = @cfunction($f, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid})).ptr
-
 SendData_wrapper(fp::Ptr{Cvoid}) = fp
-SendData_wrapper(f) = @cfunction($f, Cint, (Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid})).ptr
-
 SendInitData_wrapper(fp::Ptr{Cvoid}) = fp
-SendInitData_wrapper(f) = @cfunction($f, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid})).ptr
-
 BGThreadRunning_wrapper(fp::Ptr{Cvoid}) = fp
-BGThreadRunning_wrapper(f) = @cfunction($f, Cint, (Cint, Cint, Ptr{Cvoid})).ptr
+=#
 
-GetVSRCData_wrapper(fp::Ptr{Cvoid}) = fp
+#### TBD
+#=GetVSRCData_wrapper(fp::Ptr{Cvoid}) = fp
 GetVSRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})).ptr
 
 
