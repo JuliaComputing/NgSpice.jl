@@ -1,15 +1,15 @@
-fpgen(a, fp) = (a=a; convert(Ptr{fp}, a))
+command(cmd::Symbol) = ngSpice_Command(cmd)
 
-_command(cmd::Symbol) = (ngSpice_Command(cmd))
-
-init()      = (p = convert(Ptr{Nothing}, 0); ngSpice_Init(p,p,p,p,p,p,p))
+init()      = ngSpice_Init(sendcharptr, sendstatptr, controlledexitptr, 
+                senddataptr, sendinitdataptr, bgthreadptr, Ptr{Cvoid})
 
 isrunning() = ngSpice_running()
 
-run()       = (init(); _command(:bg_run))
-start()     = (init(); _command(:bg_run)) # is it necessary?
+run()       = (init(); command(:run))
+bgrun()     = (init(); command(:bg_run))
 
-halt()      = _command(:bg_halt)
-stop()      = _command(:bg_halt) # is it necessary?
+halt()      = command(:bg_halt)
+bghalt()    = command(:bg_halt) 
 
-reset()     = _command(:reset)
+reset()     = command(:reset)
+

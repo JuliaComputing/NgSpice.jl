@@ -41,7 +41,7 @@ const pvecvaluesall = Ptr{vecvaluesall}
 
 struct vecinfo
     number::Cint
-    vecname::Cstring
+    name::Cstring
     is_real::Cint
     pdvec::Ptr{Cvoid}
     pdvecscale::Ptr{Cvoid}
@@ -60,22 +60,77 @@ end
 
 const pvecinfoall = Ptr{vecinfoall}
 
-#=Function pointers skipped by the generator
+ngerror, bgrunning, vecgetnum = 0, 0, 0
 
-SendChar       typedef of callback function for reading printf, fprintf, fputs
-SendStat       typedef of callback function for reading status string and precent value
-ControlledExit typedef of callback function for tranferring a signal upon
-               ngspice controlled_exit to caller. May be used by caller
-               to detach ngspice.dll.
-SendData       typedef of callback function for sending an array of structs containing
-               data values of all vectors in the current plot (simulation output)
-SendInitData   typedef of callback function for sending an array of structs containing info on
-               all vectors in the current plot (immediately before simulation starts)
-BGThreadRunning typedef of callback function for sending a boolean signal (true if thread
-                is running)
-=#
+function sendchar(_text::Ptr{Cchar}, id::Int32, userdata)::Cint
+    _text != C_NULL || throw("Not a valid text")
+    text = unsafe_string(_text)
+    println("SPICE STATUS : $text" )
+    occursin(r"stderr Error:"i, text) && (ngerror = 1)
+    return 0
+end
 
-const FnTypeSignatures = Dict(
+gen_sendcharptr() = @cfunction($sendchar, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
+sendcharptr       = gen_sendcharptr()
+
+function sendstat(_text::Ptr{Cchar}, id::Int32, userdata)::Cint
+    _text != C_NULL || throw("Not a valid text")
+    text = unsafe_string(_text)
+    println("SPICE STATUS : $text" )
+    return 0
+end
+
+gen_sendstatptr() = @cfunction($sendstat, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
+sendstatptr       = gen_sendstatptr()
+
+function bgthreadrunning(run::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
+    bgrunning = run
+    run ? println("BG thread is not running") : 
+        println("BG thread is running")
+    return 0
+end
+
+gen_bgthreadptr() = @cfunction($bgthreadrunning, Cint, (Cint, Cint, Ptr{Cvoid}))
+bgthreadptr       = gen_bgthreadptr()
+
+function controlledexit(exitstatus::Cint, immediate::Cint, 
+    quitexit::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
+    quitexit && println("Returned from quit with exit status")
+    immediate ? (println("Unloading Ngspice"); ngSpice_Command("quit")) :
+        (println("Prepare an unload"); will_unload = 1)
+    return exitstatus
+end
+
+get_controlledexitptr() = @cfunction($controlledexit, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid}))
+controlledexitptr       = get_controlledexitptr() 
+
+
+function senddata(vecdata::Ptr{vecvaluesall}, novecs::Cint, 
+    id::Cint, userdata::Ptr{Cvoid})::Cint
+    ##TBD
+    #=v2dat = vecdata.vecsa[vecgetnum].creal
+    if !hasbreak && v2dat > 0.5
+        send SIGTERM and run alterp from main thread on Windows machines
+    =#
+    return 0
+end
+
+get_senddataptr = @cfunction($sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
+senddataptr     = get_senddataptr() 
+
+function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
+    for i in range(1, stop=initdata.veccount)
+        println("Vector: $(initdata.vecs[i].name)")
+        occursin(r"V(2)"i, initdata.vecs[i].name) && (vecgetnum = i)
+    end
+    return 0
+end
+
+get_sendinitdataptr = @cfunction($sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
+sendinitdataptr     = get_sendinitdataptr() 
+
+#### TBD: Do we still need these `_wrappers` and `FnTypeSignatures`?
+#=const FnTypeSignatures = Dict(
     :SendChar        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
     :SendStat        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
     :ControlledExit  => (:Cint, :((Cint, Cint, Cint, Cint, Ptr{Cvoid}))),
@@ -115,24 +170,4 @@ GetISRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}
 
 GetSyncData_wrapper(fp::Ptr{Cvoid}) = fp
 GetSyncData_wrapper(f) = @cfunction($f, Cint, (Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})).ptr
-
-function SendChar(text::String, id::Int32, userdata)
-    println("SPICE : $text" )
-end
-
-sendchar = @cfunction($SendChar, Cint, (Cstring, Cint, Ptr{Cvoid}))
-
-function SendStat(text::String, id::Int32, userdata)
-
-    println("SPICE : $text" )
-    return 0
-end
-
-sendstat = @cfunction($SendStat, Cint, (Cstring, Cint, Ptr{Cvoid}))
-
-function SendInitData(pvia::Ptr{vecinfoall}, id, ptr)
-
-    println(pvia)
-    return 0
-end
-sendinitdata = @cfunction($SendInitData, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
+=#
