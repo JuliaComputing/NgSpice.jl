@@ -9,7 +9,6 @@
 This repository provides a Julia wrapper for Ngspice library.
 
 ## Usage:
----
 
 In a Julia REPL,
 ```
