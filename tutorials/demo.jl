@@ -6,5 +6,5 @@ netpath = joinpath(@__DIR__, "..", "inputs/vdiv.cir") |> normpath
 
 n.init()
 n.cmd("source $netpath")
-n.ngSpice_Command("display")
+n.cmd(:display)
 n.cmd(:run)

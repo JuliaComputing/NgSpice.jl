@@ -10,41 +10,46 @@ const VF_MINGIVEN = (1 << 5)
 const VF_MAXGIVEN = (1 << 6)
 const VF_PERMANENT = (1 << 7)
 
+"""
+ Vector info obtained from any vector in ngspice.dll.
+ Allows direct access to the ngspice internal vector structure,
+ as defined in include/ngspice/devc.h .
+"""
 struct vector_info
-    name::Cstring
-    type::Cint
-    flags::Int16
-    realdata::Ptr{Cdouble}
-    compdata::Ptr{ngcomplex_t}
-    length::Cint
-end
+    name::Cstring              # Same as so_vname
+    type::Cint 	               # Same as so_vtype
+    flags::Int16               # Flags (a combination of VF_*)
+    realdata::Ptr{Cdouble}     # Real data
+    compdata::Ptr{ngcomplex_t} # Complex data.
+    length::Cint               # Length of the vector
 
 const pvector_info = Ptr{vector_info}
 
 struct vecvalues
-    name::Cstring
-    creal::Cdouble
-    cimag::Cdouble
-    is_scale::Cint
-    is_complex::Cint
+    name::Cstring              # name of a specific vector 
+    creal::Cdouble             # actual data value
+    cimag::Cdouble             # actual data value
+    is_scale::Cint             # if 'name' is the scale vector
+    is_complex::Cint           # if the data are complex numbers
 end
 
 const pvecvalues = Ptr{vecvalues}
 
 struct vecvaluesall
-    veccount::Cint
-    vecindex::Cint
-    vecsa::Ptr{pvecvalues}
+    veccount::Cint         # number of vectors in plot
+    vecindex::Cint         # index of actual set of vectors. i.e. the number of accepted data point
+    vecsa::Ptr{pvecvalues} # values of actual set of vectors, indexed from 0 to veccount - 1 
+        #just pvecvalues?
 end
 
 const pvecvaluesall = Ptr{vecvaluesall}
+struct vecinfo              
+    number::Cint           # number of vector, as postion in the linked list of vectors, s
+    name::Cstring          # name of the actual vector 
+    is_real::Cint          # 1 if the actual vector has real data
+    pdvec::Ptr{Cvoid}      # a void pointer to struct dvec *d, the actual vector
+    pdvecscale::Ptr{Cvoid} # a void pointer to struct dvec *ds, the scale vector
 
-struct vecinfo
-    number::Cint
-    name::Cstring
-    is_real::Cint
-    pdvec::Ptr{Cvoid}
-    pdvecscale::Ptr{Cvoid}
 end
 
 const pvecinfo = Ptr{vecinfo}
@@ -55,7 +60,7 @@ struct vecinfoall
     date::Cstring
     type::Cstring
     veccount::Cint
-    vecs::Ptr{pvecinfo}
+    vecs::Ptr{pvecinfo} # just pvecinfo?
 end
 
 const pvecinfoall = Ptr{vecinfoall}
@@ -107,11 +112,11 @@ pcontrolledexit       = gen_pcontrolledexit()
 
 function senddata(vecdata::Ptr{vecvaluesall}, novecs::Cint, 
     id::Cint, userdata::Ptr{Cvoid})::Cint
-    ##TBD
-    #=v2dat = vecdata.vecsa[vecgetnum].creal
-    if !hasbreak && v2dat > 0.5
-        send SIGTERM and run alterp from main thread on Windows machines
-    =#
+    allvecdata = []
+    for i in range(0, stop=novecs)
+        append!(allvecdata, unsafe_load(vecdata.vecsa))
+    end
+    #println(allvecdata)
     return 0
 end
 
@@ -120,8 +125,9 @@ psenddata       = gen_psenddata()
 
 function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
     for i in range(1, stop=initdata.veccount)
-        println("Vector: $(initdata.vecs[i].name)")
-        occursin(r"V(2)"i, initdata.vecs[i].name) && (vecgetnum = i)
+        vec = unsafe_load(initdata.vecs[i])
+        println("Vector: $(vec.name)")
+        #occursin(r"V(2)"i, vec.name) && (vecgetnum = i)
     end
     return 0
 end
