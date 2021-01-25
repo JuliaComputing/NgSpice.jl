@@ -24,14 +24,14 @@ An example circuit:
 ```
 source /filepath/netlist # without quotes
 display                  # prints all vectors and constants
-plot vector              # plots the real part of vector by default
+plot vector1 vector2     # plots the real part of vector by default
 ```
 
 
 Note: It is not necessary for `.cir` to be placed in `bin` folder as long as full path is specified.
 
 ---
-Plotting syntax:  `plot -x vectorlist` where `x` takes following modes:
+Plotting syntax:  `plot -x space seperated vectorlist` where `x` takes following modes:
 
 | Modes | Description |
 |---------|-------|

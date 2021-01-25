@@ -71,7 +71,7 @@ ngerrorf, bgrunningf, vecgetnum = 0, 0, 0
 function sendchar(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
-    println(text[8:end])
+    println(text)
     occursin(r"stderr Error:"i, text) && (ngerrorf = 1)
     return 0
 end
