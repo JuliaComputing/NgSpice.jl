@@ -1,5 +1,5 @@
 __precompile__()
-module Ngspice
+module NgSpice
 
 using ngspice_jll
 export ngspice_jll
@@ -26,14 +26,17 @@ foreach(names(@__MODULE__, all=true)) do s
 end #should this be replaced with aliases
 
 include("API/get_vector.jl")
+include("API/graphs.jl")
 include("API/netlist.jl")
-include("API/plots.jl")
 include("API/running.jl")
+include("API/repl.jl")
 
-export get_vector_info, load_netlist,
-       bghalt, bgrun, cmd, init, isrunning, reset, simhalt, simrun, 
-       allplots, curplot, getimagplot, getmagnitudeplot,
-       getphaseplot, getplot, getrealplot
+export get_vector_info, load_netlist, 
+       semilogplot,
+       bghalt, bgrun, cmd, init, isrunning, reset, simrun, simstop, 
+       allvecs, curplot, getimagvec, getmagnitudevec,
+       getphasevec, getvec, getrealvec,
+       interactive
 
 end
 
