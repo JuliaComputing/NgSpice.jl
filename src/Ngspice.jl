@@ -33,7 +33,7 @@ include("API/repl.jl")
 
 export get_vector_info, load_netlist, 
        semilogplot,
-       bghalt, bgrun, cmd, init, isrunning, reset, simrun, simstop, 
+       bghalt, bgrun, cmd, init, isrunning, reset, ngrun, ngstop, 
        allvecs, curplot, getimagvec, getmagnitudevec,
        getphasevec, getvec, getrealvec,
        interactive

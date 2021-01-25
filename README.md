@@ -1,38 +1,45 @@
-# Ngspice
+# NgSpice
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaComputing.github.io/Ngspice.jl/stable)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaComputing.github.io/Ngspice.jl/dev)
-[![Build Status](https://github.com/JuliaComputing/Ngspice.jl/workflows/CI/badge.svg)](https://github.com/JuliaComputing/Ngspice.jl/actions)
-[![Coverage](https://codecov.io/gh/JuliaComputing/Ngspice.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaComputing/Ngspice.jl)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaComputing.github.io/NgSpice.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaComputing.github.io/NgSpice.jl/dev)
+[![Build Status](https://github.com/JuliaComputing/NgSpice.jl/workflows/CI/badge.svg)](https://github.com/JuliaComputing/NgSpice.jl/actions)
+[![Coverage](https://codecov.io/gh/JuliaComputing/NgSpice.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaComputing/NgSpice.jl)
 
 
-This repository provides a Julia wrapper for Ngspice library.
+This repository provides a Julia wrapper for NgSpice library.
 
 ## Usage:
 
 In a Julia REPL,
 ```
-] add https://github.com/JuliaComputing/Ngspice.jl
-using Ngspice
+] add https://github.com/JuliaComputing/NgSpice.jl
+using NgSpice
 ```
-You can run all the commands in an interactive mode by running,
-`cmd("the_command")`
+To start an an interactive mode,
+- Run `Ngspice.interactive()` in REPL
 
-> Commands to run an Ngspice simulation can be found [here](http://ngspice.sourceforge.net/docs/ngspice-html-manual/manual.xhtml#magicparlabel-21623). <br>
-All commands that Ngspice allows can be found [here](http://ngspice.sourceforge.net/docs/ngspice-html-manual/manual.xhtml#sec_Commands).
+- Hit `~` for initializing the NgSpice
+
+An example circuit:
+```
+source /filepath/netlist # without quotes
+display                  # prints all vectors and constants
+plot vector              # plots the real part of vector by default
+```
+
+
+Note: It is not necessary for `.cir` to be placed in `bin` folder as long as full path is specified.
 
 ---
+Plotting syntax:  `plot -x vectorlist` where `x` takes following modes:
 
-Example to load a circuit and display all variables:
-```
-netpath = "path to .cir file"
-init()
-cmd("source $netpath") 
-cmd(:display)
-cmd(:run)
-```
+| Modes | Description |
+|---------|-------|
+| -r, --real | Real part of vector|
+| -i, --imaginary | Imaginary part of vector |
+| -m, --magnitude | Magnitude of vector |
+| -p, --phase | Phase of vector |
 
-Note that it is not necessary for `.cir` to be placed in `bin` folder as long as the path is specified.
+> Other commands to run an NgSpice simulation can be found [here](http://ngspice.sourceforge.net/docs/ngspice-html-manual/manual.xhtml#magicparlabel-21623). <br>
+All commands that NgSpice allows can be found [here](http://ngspice.sourceforge.net/docs/ngspice-html-manual/manual.xhtml#sec_Commands).
 
----
-`plot` refers to vectors in Ngspice. Any functions affixed with `plot` uses it in the same meaning.
