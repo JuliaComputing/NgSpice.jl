@@ -22,6 +22,7 @@ struct vector_info
     realdata::Ptr{Cdouble}     # Real data
     compdata::Ptr{ngcomplex_t} # Complex data.
     length::Cint               # Length of the vector
+end
 
 const pvector_info = Ptr{vector_info}
 
@@ -38,7 +39,7 @@ const pvecvalues = Ptr{vecvalues}
 struct vecvaluesall
     veccount::Cint         # number of vectors in plot
     vecindex::Cint         # index of actual set of vectors. i.e. the number of accepted data point
-    vecsa::Ptr{pvecvalues} # values of actual set of vectors, indexed from 0 to veccount - 1 
+    vecsa::pvecvalues # values of actual set of vectors, indexed from 0 to veccount - 1 
         #just pvecvalues?
 end
 
@@ -60,17 +61,17 @@ struct vecinfoall
     date::Cstring
     type::Cstring
     veccount::Cint
-    vecs::Ptr{pvecinfo} # just pvecinfo?
+    vecs::pvecinfo 
 end
 
-const pvecinfoall = Ptr{vecinfoall}
+#const pvecinfoall = Ptr{vecinfoall}
 
 ngerrorf, bgrunningf, vecgetnum = 0, 0, 0
 
-function sendchar(_text::Ptr{Cchar}, id::Int32, userdata)::Cint
+function sendchar(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
-    println("SPICE STATUS : $text" )
+    println(text[8:end])
     occursin(r"stderr Error:"i, text) && (ngerrorf = 1)
     return 0
 end
@@ -78,10 +79,10 @@ end
 gen_psendchar() = @cfunction($sendchar, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
 psendchar       = gen_psendchar()
 
-function sendstat(_text::Ptr{Cchar}, id::Int32, userdata)::Cint
+function sendstat(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
-    println("SPICE STATUS : $text" )
+    println(text)
     return 0
 end
 
@@ -101,14 +102,13 @@ pbgthread       = gen_pbgthread()
 function controlledexit(exitstatus::Cint, immediate::Cint, 
     quitexit::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
     quitexit && println("Returned from quit with exit status")
-    immediate ? (println("Unloading Ngspice"); ngSpice_Command("quit")) :
+    immediate ? (println("Unloading NgSpice"); ngSpice_Command("quit")) :
         (println("Prepare an unload"); will_unload = 1)
     return exitstatus
 end
 
 gen_pcontrolledexit() = @cfunction($controlledexit, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid}))
 pcontrolledexit       = gen_pcontrolledexit() 
-
 
 function senddata(vecdata::Ptr{vecvaluesall}, novecs::Cint, 
     id::Cint, userdata::Ptr{Cvoid})::Cint
@@ -124,10 +124,13 @@ gen_psenddata() = @cfunction($senddata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}
 psenddata       = gen_psenddata() 
 
 function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
-    for i in range(1, stop=initdata.veccount)
-        vec = unsafe_load(initdata.vecs[i])
-        println("Vector: $(vec.name)")
-        #occursin(r"V(2)"i, vec.name) && (vecgetnum = i)
+    initdata == C_NULL && throw("No initialized data")
+    data = unsafe_load(initdata)
+    vec = unsafe_wrap(Array, data.vecs, (data.veccount, ))
+    #println("-----SendInit-------")
+    for v in vec
+        v.name == C_NULL && return 0
+        println("Vector: $(unsafe_string(v.name))")
     end
     return 0
 end
