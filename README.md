@@ -16,7 +16,7 @@ In a Julia REPL,
 using NgSpice
 ```
 To start an an interactive mode,
-- Run `Ngspice.interactive()` in REPL
+- Run `NgSpice.interactive()` in REPL
 
 - Hit `~` for initializing the NgSpice
 
