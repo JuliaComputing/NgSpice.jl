@@ -15,7 +15,11 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     end
 end
 
-curplot() = ngSpice_CurPlot()
+function curplot()
+    cur = ngSpice_CurPlot()
+    cur != C_NULL || throw("No current plots")
+    unsafe_string(cur)
+end
 
 function allvecs()
     curplot = ngSpice_CurPlot();
@@ -35,7 +39,7 @@ function getvec(name, maxlen=Int(maxintfloat()))
 end
 
 function getrealvec(name, maxlen=Int(maxintfloat()))
-    _, data = get_vector_info(name, maxlen)
+    _, data = get_vector_info(String(name), maxlen)
     real(data)
 end
 
