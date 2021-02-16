@@ -4,12 +4,14 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     vecinfo = unsafe_load(vec)
     vname  = unsafe_string(vecinfo.name)
     len = min(maxlen, vecinfo.length)
+    typelist = ["time", "frequency", "current", "voltage"]
+    vtype = typelist[vecinfo.type]
     if (vecinfo.flags & VF_REAL) != 0
         vreal = copy(unsafe_wrap(Array, vecinfo.realdata, (len,)))
-        return vname, vreal
+        return vname, vtype, vreal
     elseif (vecinfo.flags & VF_COMPLEX) != 0
         vcomplex = copy(unsafe_wrap(Array, vecinfo.compdata, (len,)))
-        return vname, vcomplex
+        return vname, vtype, vcomplex
     else
         error("Unknown vector type")
     end
@@ -21,39 +23,39 @@ function curplot()
     unsafe_string(cur)
 end
 
-function allvecs()
-    curplot = ngSpice_CurPlot();
+function listallvecs(novecs=Int(maxintfloat()))
+    curplot = NgSpice.curplot()
     curplot != C_NULL || throw("No current plots")
-    allplots = ngSpice_AllVecs(curplot)
-    ret = []
-    plot = allplots
-    while plot != C_NULL
-        ret = [ret; unsafe_string(unsafe_load(plot))] #see if this is efficient
-        plot += 1
+    ppallplots = ngSpice_AllVecs(curplot)
+    pallplots = unsafe_wrap(Array, ppallplots, novecs)
+    allplots = []
+    for pplot in pallplots
+        pplot != C_NULL || return allplots
+        plt = unsafe_string(pplot)
+        push!(allplots, plt)
     end
-    return ret
-end #revisit
+end 
 
 function getvec(name, maxlen=Int(maxintfloat()))
     get_vector_info(name, maxlen) 
 end
 
 function getrealvec(name, maxlen=Int(maxintfloat()))
-    _, data = get_vector_info(String(name), maxlen)
+    _, __, data = get_vector_info(String(name), maxlen)
     real(data)
 end
 
 function getimagvec(name, maxlen=Int(maxintfloat()))
-    _, data = get_vector_info(name, maxlen)
+    _, __, data = get_vector_info(name, maxlen)
     imag(data)
 end
 
 function getmagnitudevec(name, maxlen=Int(maxintfloat()))
-    _, data = get_vector_info(name, maxlen)
+    _, __, data = get_vector_info(name, maxlen)
     abs.(data)
 end
 
 function getphasevec(name, maxlen=Int(maxintfloat))
-    _, data = get_vector_info(name, maxlen)
+    _, __, data = get_vector_info(name, maxlen)
     angle.(data)
 end
