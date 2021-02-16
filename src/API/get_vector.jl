@@ -23,17 +23,34 @@ function curplot()
     unsafe_string(cur)
 end
 
-function listallvecs(novecs=Int(maxintfloat()))
-    curplot = NgSpice.curplot()
-    curplot != C_NULL || throw("No current plots")
-    ppallplots = ngSpice_AllVecs(curplot)
-    pallplots = unsafe_wrap(Array, ppallplots, novecs)
-    allplots = []
+function listallplots(nplots=Int(maxintfloat()))
+    ppallplots = ngSpice_AllPlots()
+    pallplots = unsafe_wrap(Array, ppallplots, nplots)
+    allplots = String[]
     for pplot in pallplots
         pplot != C_NULL || return allplots
         plt = unsafe_string(pplot)
         push!(allplots, plt)
     end
+end
+
+function listcurvecs(plot=curplot(), nvecs=Int(maxintfloat()))
+    ppcurvecs = ngSpice_AllVecs(plot)
+    pcurvecs = unsafe_wrap(Array, ppcurvecs, nvecs)
+    curvecs = String[]
+    for pvec in pcurvecs
+        pvec != C_NULL || return curvecs
+        v = unsafe_string(pvec)
+        push!(curvecs, v)
+    end
+end
+
+function listallvecs(lplot=listallplots())
+    allvecs = []
+    for plot in lplot
+        push!(allvecs, [plot, listcurvecs(plot)])
+    end  
+    return allvecs      
 end 
 
 function getvec(name, maxlen=Int(maxintfloat()))
