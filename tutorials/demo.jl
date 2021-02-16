@@ -1,10 +1,10 @@
-#This simulates the ac_ascii file
+# To run the NgSpice in non-interactive mode (aka as Julia functions)
 
-import Ngspice as n
+import NgSpice as n
 
-netpath = joinpath(@__DIR__, "..", "inputs/vdiv.cir") |> normpath
+netpath = joinpath(@__DIR__, "..", "inputs/ac_ascii.cir") |> normpath
 
 n.init()
 n.cmd("source $netpath")
-n.cmd(:display)
 n.cmd(:run)
+n.cmd(:display)
