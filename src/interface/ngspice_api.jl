@@ -27,7 +27,7 @@ function ngSpice_AllPlots()
 end
 
 function ngSpice_AllVecs(plotname)
-    ccall((:ngSpice_AllVecs, libngspice), Ptr{Cstring}, (Cstring,), plotname)
+    ccall((:ngSpice_AllVecs, libngspice), Ptr{Ptr{UInt8}}, (Cstring,), plotname)
 end
 
 function ngSpice_running()
