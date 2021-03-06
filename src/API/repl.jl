@@ -1,5 +1,4 @@
 using ReplMaker
-using Requires
 using Plots
 
 function _ngspice_parser(str)
