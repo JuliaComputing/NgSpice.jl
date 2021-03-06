@@ -1,5 +1,6 @@
 using ReplMaker
-using DelimitedFiles
+using Requires
+using Plots
 
 function _ngspice_parser(str)
     if str == "init" init()       
@@ -16,9 +17,6 @@ function _ngspice_parser(str)
                 write(io, " ]")
             end
         end
-    #=elseif str == "report"
-        curr = curplot()
-        unsafe_string(ngSpice_AllVecs(curr))=#
     else 
         cmd(str)
     end
@@ -108,12 +106,11 @@ end
 
 function plotswitch(pltstr)
     params = split(pltstr[6:end], " ")
-    getthisvec = vecswitch(pltstr[6:end])
-    if !occursin("-", params[1]) semilogplot(getrealvec, params, "Real plot")
-    elseif params[1] ∈ ("--real", "-r") semilogplot(getrealvec, params[2:end], "Real plot")
-    elseif params[1] ∈ ("--imaginary", "-i") semilogplot(getimagvec, params[2:end], "Imaginary plot") 
-    elseif params[1] ∈ ("--magnitude", "-m") semilogplot(getmagnitudevec, params[2:end], "Magnitude plot")
-    elseif params[1] ∈ ("--phase", "-p") semilogplot(getphasevec, params[2:end], "Phase plot")
+    if !occursin("-", params[1]) plot(graph, getrealvec, params[1], params[2:end], "Real plot")
+    elseif params[1] ∈ ("--real", "-r") plot(graph, getrealvec, params[2], params[3:end], "Real plot")
+    elseif params[1] ∈ ("--imaginary", "-i") plot(graph, getimagvec, params[2], params[3:end], "Imaginary plot") 
+    elseif params[1] ∈ ("--magnitude", "-m") plot(graph, getmagnitudevec, params[2], params[3:end], "Magnitude plot")
+    elseif params[1] ∈ ("--phase", "-p") plot(graph, getphasevec, params[2], params[3:end], "Phase plot")
     else throw("$(params[1]) is not a valid plot type")
     end
 end

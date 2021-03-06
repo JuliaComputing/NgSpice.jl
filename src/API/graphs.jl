@@ -7,7 +7,20 @@ struct NgSpiceGraphs end
 
 const graph = NgSpiceGraphs()
 
-@recipe function p(::NgSpiceGraphs, fort, veclist, title)
+@recipe function ng(::NgSpiceGraphs, fort, veclist, title)
+    ft = getrealvec(fort)
+    legend := true
+    grid := true
+    title := "$title"
+    background_color --> Colors.RGB(0.0, 0.0, 0.0)
+    xguide := fort
+    color_palette --> :default
+    seriestype := :path
+    vec = getrealvec.(veclist)
+    ft, vec
+end
+
+@recipe function ng(::NgSpiceGraphs, vectype, fort, veclist, title)
     ft = getrealvec(fort)
     legend := true
     grid := true
@@ -16,6 +29,6 @@ const graph = NgSpiceGraphs()
     xguide := fort
     color_palette --> :default
     seriestype := :path
-    vec = getrealvec.(veclist)
+    vec = vectype.(veclist)
     ft, vec
 end
