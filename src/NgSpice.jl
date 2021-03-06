@@ -32,7 +32,7 @@ include("API/running.jl")
 include("API/repl.jl")
 
 export get_vector_info, load_netlist, 
-       semilogplot,
+       NgSpiceGraphs, graph,
        bghalt, bgrun, cmd, init, isrunning, reset, ngrun, ngstop, 
        curplot, listallplots, listallvecs, listcurvecs, getimagvec, 
        getmagnitudevec, getphasevec, getvec, getrealvec,

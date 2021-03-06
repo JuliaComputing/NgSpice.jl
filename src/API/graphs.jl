@@ -1,31 +1,21 @@
 using RecipesBase
-using Plots
+using Colors
 
 # Plotting the graphs with frequency as X-axis
 
-struct SemiLogType end
+struct NgSpiceGraphs end
 
-const sl = SemiLogType()
+const graph = NgSpiceGraphs()
 
-@recipe function plot(::SemiLogType, fort::Vector, vec::Vector, title, xname, vecname)
+@recipe function p(::NgSpiceGraphs, fort, veclist, title)
+    ft = getrealvec(fort)
     legend := true
+    grid := true
     guide := "$title"
-    xguide := xname
-    background_color --> RGB(0.0, 0.0, 0.0)
+    background_color --> Colors.RGB(0.0, 0.0, 0.0)
+    xguide := fort
     color_palette --> :default
-    seriestype := :path 
-    fort, vec 
-end
-
-function semilogplot(plottype, vecname, title, maxlen=Int(maxintfloat()))
-    vec = plottype.(vecname, maxlen)
-    fort, xname = Nothing, ""
-    try
-        fort = getrealvec("time", maxlen)
-        xname = "Time"
-    catch (e)
-        fort = getrealvec("frequency", maxlen)
-        xname = "Frequency"
-    end
-    plot(sl, fort, vec, title, xname, vecname)
+    seriestype := :path
+    vec = getrealvec.(veclist)
+    ft, vec
 end
