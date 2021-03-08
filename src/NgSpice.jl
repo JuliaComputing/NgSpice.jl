@@ -4,6 +4,8 @@ module NgSpice
 using ngspice_jll
 export ngspice_jll
 
+using Requires
+
 include("interface/ctypes.jl")
 export Ctm, Ctime_t, Cclock_t
 
@@ -29,10 +31,13 @@ include("API/get_vector.jl")
 include("API/graphs.jl")
 include("API/netlist.jl")
 include("API/running.jl")
-include("API/repl.jl")
+
+function __init__()
+    @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" @eval include("API/repl.jl")
+end
 
 export get_vector_info, load_netlist, 
-       semilogplot,
+       NgSpiceGraphs, graph,
        bghalt, bgrun, cmd, init, isrunning, reset, ngrun, ngstop, 
        curplot, listallplots, listallvecs, listcurvecs, getimagvec, 
        getmagnitudevec, getphasevec, getvec, getrealvec,

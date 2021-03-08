@@ -5,17 +5,17 @@ version = "0.1.0"
 
 [deps]
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
-DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
-Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Colors = "5ae59095-9a9b-59fe-a467-6f913c188581"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 ReplMaker = "b873ce64-0db9-51f5-a568-4457d8e49576"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 ngspice_jll = "57e080ce-e004-5ece-a144-c95753423b2a"
 
 [compat]
 CEnum = "0.4"
-ReplMaker = "0.2"
 RecipesBase = "1.1"
-julia = "1.5"
+ReplMaker = "0.2"
+julia = "^1.5"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
