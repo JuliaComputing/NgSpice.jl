@@ -1,5 +1,5 @@
 using ReplMaker
-using Plots
+using .Plots
 
 function _ngspice_parser(str)
     if str == "init" init()       

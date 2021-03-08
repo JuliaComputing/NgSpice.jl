@@ -14,6 +14,7 @@ const graph = NgSpiceGraphs()
     title := "$title"
     background_color --> Colors.RGB(0.0, 0.0, 0.0)
     xguide := fort
+    guide := String.(veclist)
     color_palette --> :default
     seriestype := :path
     vec = getrealvec.(veclist)
@@ -24,9 +25,10 @@ end
     ft = getrealvec(fort)
     legend := true
     grid := true
-    guide := "$title"
+    title := "$title"
     background_color --> Colors.RGB(0.0, 0.0, 0.0)
     xguide := fort
+    guide := String.(veclist)
     color_palette --> :default
     seriestype := :path
     vec = vectype.(veclist)
