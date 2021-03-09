@@ -101,8 +101,8 @@ pbgthread       = gen_pbgthread()
 
 function controlledexit(exitstatus::Cint, immediate::Cint, 
     quitexit::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
-    quitexit && println("Returned from quit with exit status")
-    immediate ? (println("Unloading NgSpice"); ngSpice_Command("quit")) :
+    quitexit == 1 && println("Returned from quit with exit status")
+    immediate == 1 ? (println("Unloading NgSpice"); ngSpice_Command("quit")) :
         (println("Prepare an unload"); will_unload = 1)
     return exitstatus
 end
