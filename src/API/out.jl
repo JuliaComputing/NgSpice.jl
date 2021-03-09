@@ -15,7 +15,7 @@ function ngdisplay()
     end
 end
 
-function vecswitch(vecstr)
+function _vecswitch(vecstr)
     if !occursin("-", vecstr) return getrealvec
     elseif vecstr ∈ ("--real", "-r") return getrealvec
     elseif vecstr ∈ ("--imaginary", "-i")  return getimagvec
@@ -29,7 +29,7 @@ function ngprint(params)
         veclist = getrealvec.(params)
         DataFrame(Dict(zip(params, veclist))) |> print
     else
-        getthisvec = vecswitch(params[1])
+        getthisvec = _vecswitch(params[1])
         veclist = getthisvec.(params[2:end])
         DataFrame(Dict(zip(params[2:end], veclist[2:end]))) |> print
     end
