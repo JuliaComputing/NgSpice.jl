@@ -13,7 +13,7 @@ bgrun()     = (init(); cmd("bg_run"))
 ngstop()    = cmd("stop")
 bghalt()    = cmd("bg_halt") 
 
-reset()     = cmd("reset")
-resume()    = cmd("resume")
+ngreset()   = cmd("reset")
+ngresume()  = cmd("resume")
 
 ngexit()    = cmd("unset askquit")
