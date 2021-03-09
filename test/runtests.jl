@@ -1,20 +1,26 @@
-using Ngspice
+using NgSpice
 using Test
 
-fpgen(a, fp) = (a=a; convert(Ptr{fp}, a))
+rootdir = joinpath(@__DIR__, "..")
+netpath = joinpath(rootdir, "inputs", "mosfet.cir")
 
-@testset "Ngspice.jl" begin
-    p = fpgen(0, Nothing)
+@testset "interface" begin
+    p = convert(Ptr{Nothing}, 0)
     @test ngSpice_Init(p, p, p, p, p, p, p) == 0
-    @test ngSpice_Command("bg_run") == 0
-    #@test typeof(ngGet_Vec_Info("vecname")) <: Ptr{Ngspice.vector_info}
-        # returns false despite the same type
-    @test_throws MethodError ngSpice_Circ("circarray") 
-        #unsafe_wrap needs to be defined for ::Type{Ptr{String}}
-    @test typeof(ngSpice_CurPlot()) <: Cstring
-    @test typeof(ngSpice_AllPlots()) <: Ptr{Cstring}
-    @test typeof(ngSpice_AllVecs("plotname")) <: Ptr{Cstring}
+    @test ngSpice_Command("source $netpath") == 0
+    @test ngSpice_CurPlot() != C_NULL
+    @test ngSpice_Command("run") == 0
+    @test typeof(ngSpice_AllPlots()) == Ptr{Ptr{UInt8}}
     @test ngSpice_running() == 0
-    @test ngSpice_SetBkpt() == 0
+    @test ngSpice_SetBkpt() == 1
+end
+
+@testset "api" begin
+    @test init() == 0
+    @test cmd("source $netpath") == 0
+    @test curplot() == "tran1"
+    @test cmd("run") == 0
+    @test listallplots() == ["tran2", "tran1", "const"]
+    @test ngstop() == 0
 end
 
