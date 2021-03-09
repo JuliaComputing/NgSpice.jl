@@ -5,13 +5,15 @@ init()      = (pvoid = convert(Ptr{Nothing}, 0);
                 pvoid, pvoid,  pbgthread, pvoid))
                 #psenddata, psendinitdata, pbgthread, pvoid))
 
-isrunning() = ngSpice_running()
+# isrunning() = ngSpice_running() # always returns 0
 
-ngrun()     = (init(); cmd(:run))
-bgrun()     = (init(); cmd(:bg_run))
+ngrun()     = (init(); cmd("run"))
+bgrun()     = (init(); cmd("bg_run"))
 
-ngstop()    = cmd(:stop)
-bghalt()    = cmd(:bg_halt) 
+ngstop()    = cmd("stop")
+bghalt()    = cmd("bg_halt") 
 
-reset()     = cmd(:reset)
+reset()     = cmd("reset")
+resume()    = cmd("resume")
 
+ngexit()    = cmd("unset askquit")
