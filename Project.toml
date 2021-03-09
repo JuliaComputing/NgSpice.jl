@@ -13,6 +13,7 @@ ngspice_jll = "57e080ce-e004-5ece-a144-c95753423b2a"
 
 [compat]
 CEnum = "0.4"
+Colors = "0.12"
 RecipesBase = "1.1"
 ReplMaker = "0.2"
 julia = "^1.5"
