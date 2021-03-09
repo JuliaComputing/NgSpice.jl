@@ -1,45 +1,23 @@
 using ReplMaker
-using DataFrames
 using .Plots
 
 
 function _ngspice_parser(str)
     if str == "init" init()       
     elseif occursin("plot", str)
-        plotswitch(str)
+        _plotswitch(str)
     elseif occursin("print", str)
         params = split(str[7:end], " ")
-        getthisvec = vecswitch(params[1])
-        if !occursin("-", params[1])
-            veclist = getthisvec.(params[1:end])
-            DataFrame(Dict(zip(params[1:end], veclist))) |> print
-        else
-            veclist = println(getthisvec.(params[2:end]))
-            DataFrame(Dict(zip(params[2:end], veclist))) |> print
-        end
+        ngprint(params = split(str[7:end], " "))
     elseif occursin("display", str)
-        plotlist = listcurplots()
-        for p in plotlist
-            p == "const" && continue
-            veclist = listcurvecs(p)
-            df = DataFrame(Name = String[], Type = String[], DataType = String[], Length = Int[])
-            for v in veclist
-                vname, vtype, vdata = getvec(v)
-                push!(vname, vtype, typeod(vdata), sizeof(vdata))
-            end
-            df |> print
-        end
+        ngdisplay()
     else 
         cmd(str)
     end
 end
 
-function _sp_parser_seperator(str)
-    f = open(str)
-    s = read(f, String)
-    close(f)
-    replace(s, "\r\n"=>"\n")
-    a = split(s, "\r\n")
+#=function _sp_parser_seperator(str)
+    a = readlines(str)
     println("Seperating .control from netlist")
     control = []
     for l in range(1, stop=length(a))
@@ -73,15 +51,11 @@ function _sp_parser_seperator(str)
         println(con)
         con != "run" && _ngspice_parser(con)
     end
-end
+end=#
 
 function _sp_parser(str)
     cmd(str)
-    f = open(str)
-    s = read(f, String)
-    close(f)
-    replace(s, "\r\n"=>"\n")
-    a = split(s, "\r\n")
+    readlines(str)
     for l in range(1, stop=length(a))
         if a[l][1] == '.'
             if a[l] == ".control"
@@ -103,17 +77,7 @@ function _sp_parser(str)
     end
 end
 
-function vecswitch(vecstr)
-    if !occursin("-", vecstr) return getrealvec
-    elseif vecstr ∈ ("--real", "-r") return getrealvec
-    elseif vecstr ∈ ("--imaginary", "-i")  return getimagvec
-    elseif vecstr ∈ ("--magnitude", "-m") return getmagnitudevec
-    elseif vecstr ∈ ("--phase", "-p") return getphasevec
-    end
-end
-
-
-function plotswitch(pltstr)
+function _plotswitch(pltstr)
     params = split(pltstr[6:end], " ")
     if !occursin("-", params[1]) plot(graph, getrealvec, params[1], params[2:end], "Real plot")
     elseif params[1] ∈ ("--real", "-r") plot(graph, getrealvec, params[2], params[3:end], "Real plot")
