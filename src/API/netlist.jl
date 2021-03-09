@@ -1,7 +1,5 @@
 function load_netlist(netpath::String)
-    netlist = open(f->read(f, String), netpath)
-    netlist = split(netlist, "\r\n")
-    #netlist = replace(netlist, "\r\n" => "")
+    netlist = readlines(netpath)
     append!(netlist, ["C_NULL"])
-    t = netlist |> pointer |> ngSpice_Circ
+    t = netlist |> ngSpice_Circ
 end
