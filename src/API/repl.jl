@@ -1,5 +1,7 @@
 using ReplMaker
+using DataFrames
 using .Plots
+
 
 function _ngspice_parser(str)
     if str == "init" init()       
@@ -8,13 +10,24 @@ function _ngspice_parser(str)
     elseif occursin("print", str)
         params = split(str[7:end], " ")
         getthisvec = vecswitch(params[1])
-        open("Vectors.txt", "w") do f 
-            for vec in params
-                val = getthisvec(vec)
-                write(io, "$vec = [")
-                writedlm(f, val)
-                write(io, " ]")
+        if !occursin("-", params[1])
+            veclist = getthisvec.(params[1:end])
+            DataFrame(Dict(zip(params[1:end], veclist))) |> print
+        else
+            veclist = println(getthisvec.(params[2:end]))
+            DataFrame(Dict(zip(params[2:end], veclist))) |> print
+        end
+    elseif occursin("display", str)
+        plotlist = listcurplots()
+        for p in plotlist
+            p == "const" && continue
+            veclist = listcurvecs(p)
+            df = DataFrame(Name = String[], Type = String[], DataType = String[], Length = Int[])
+            for v in veclist
+                vname, vtype, vdata = getvec(v)
+                push!(vname, vtype, typeod(vdata), sizeof(vdata))
             end
+            df |> print
         end
     else 
         cmd(str)
@@ -50,14 +63,11 @@ function _sp_parser_seperator(str)
                 if a[endc+1] != ".end"
                     println("Few commands after .control ends")
                 end
-            #=elseif a[l] == ".print"
-
-                
+            #=elseif a[l] == ".print"              
                 params = split(str[7:end], " ")
                 getthisvec = vecswitch(params[1]) 
                 println(getthisvec(params[2:end]))=#
             end
-        
     end
     for con in control
         println(con)
@@ -95,7 +105,7 @@ end
 
 function vecswitch(vecstr)
     if !occursin("-", vecstr) return getrealvec
-    elseif vecsrtr ∈ ("--real", "-r") return getrealvec
+    elseif vecstr ∈ ("--real", "-r") return getrealvec
     elseif vecstr ∈ ("--imaginary", "-i")  return getimagvec
     elseif vecstr ∈ ("--magnitude", "-m") return getmagnitudevec
     elseif vecstr ∈ ("--phase", "-p") return getphasevec
