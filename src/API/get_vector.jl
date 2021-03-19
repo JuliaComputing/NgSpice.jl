@@ -4,8 +4,8 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     vecinfo = unsafe_load(vec)
     vname  = unsafe_string(vecinfo.name)
     len = min(maxlen, vecinfo.length)
-    typelist = ["time", "frequency", "current", "voltage"]
-    vtype = typelist[vecinfo.type]
+    typelist = ["notype", "time", "frequency", "current", "voltage"]
+    vtype = typelist[vecinfo.type+1]
     if (vecinfo.flags & VF_REAL) != 0
         vreal = copy(unsafe_wrap(Array, vecinfo.realdata, (len,)))
         return vname, vtype, vreal
@@ -46,10 +46,7 @@ function listcurvecs(plot=curplot(), nvecs=Int(maxintfloat()))
 end
 
 function listallvecs(lplot=listallplots())
-    allvecs = []
-    for plot in lplot
-        push!(allvecs, [plot, listcurvecs(plot)])
-    end  
+    allvecs = Dict(lplot .=> listcurvecs.(lplot))
     return allvecs      
 end 
 
