@@ -15,6 +15,7 @@ ngspice_jll = "57e080ce-e004-5ece-a144-c95753423b2a"
 [compat]
 CEnum = "0.4"
 Colors = "0.12"
+DataFrames = "0.22"
 RecipesBase = "1.1"
 ReplMaker = "0.2"
 Requires = "1.1"
