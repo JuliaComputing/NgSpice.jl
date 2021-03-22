@@ -9,6 +9,8 @@ init()      = (pvoid = convert(Ptr{Nothing}, 0);
 run()     = cmd("run")
 bgrun()   = cmd("bg_run")
 
+set_breakpoint(bkpt::Float64) = ngSpice_SetBkpt(bkpt)
+
 stop()    = cmd("stop")
 bghalt()  = cmd("bg_halt") 
 

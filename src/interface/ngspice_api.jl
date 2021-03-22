@@ -34,6 +34,6 @@ function ngSpice_running()
     ccall((:ngSpice_running, libngspice), Cint, ())
 end
 
-function ngSpice_SetBkpt()
-    ccall((:ngSpice_SetBkpt, libngspice), Cint, ())
+function ngSpice_SetBkpt(bkpt)
+    ccall((:ngSpice_SetBkpt, libngspice), Cint, (Cdouble,), bkpt)
 end
