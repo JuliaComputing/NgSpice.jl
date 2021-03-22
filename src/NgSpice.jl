@@ -42,8 +42,8 @@ export get_vector_info,
        getmagnitudevec, getphasevec, getvec, getrealvec,
        NgSpiceGraphs, graph,
        load_netlist, source,
-       ngdisplay, ngprint, 
-       bghalt, bgrun, cmd, init, ngrun, ngstop, ngresume, ngreset, ngexit,
+       display, print, 
+       bghalt, bgrun, cmd, init, run, stop, resume, reset, exit,
        interactive
        #isrunning,
 end

@@ -7,13 +7,13 @@ init()      = (pvoid = convert(Ptr{Nothing}, 0);
 
 # isrunning() = ngSpice_running() # always returns 0
 
-ngrun()     = (init(); cmd("run"))
-bgrun()     = (init(); cmd("bg_run"))
+run()     = (init(); cmd("run"))
+bgrun()   = (init(); cmd("bg_run"))
 
-ngstop()    = cmd("stop")
-bghalt()    = cmd("bg_halt") 
+stop()    = cmd("stop")
+bghalt()  = cmd("bg_halt") 
 
-ngreset()   = cmd("reset")
-ngresume()  = cmd("resume")
+reset()   = cmd("reset")
+resume()  = cmd("resume")
 
-ngexit()    = cmd("unset askquit")
+exit()    = cmd("unset askquit")

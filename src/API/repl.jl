@@ -8,9 +8,9 @@ function _ngspice_parser(str)
         _plotswitch(str)
     elseif occursin("print", str)
         params = split(str[7:end], " ")
-        ngprint(params = split(str[7:end], " "))
+        NgSpice.print(params = split(str[7:end], " "))
     elseif occursin("display", str)
-        ngdisplay()
+        NgSpice.display()
     else 
         cmd(str)
     end
