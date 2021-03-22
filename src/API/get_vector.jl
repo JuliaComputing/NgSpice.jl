@@ -4,8 +4,13 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     vecinfo = unsafe_load(vec)
     vname  = unsafe_string(vecinfo.name)
     len = min(maxlen, vecinfo.length)
-    typelist = ["notype", "time", "frequency", "current", "voltage"]
-    vtype = typelist[vecinfo.type+1]
+    typelist = Dict(0 => "notype",
+                    1 => "time",
+                    2 => "frequency",
+                    3 => "current",
+                    4 => "voltage",
+                    16 => "impedence")
+    vtype = vecinfo.type ∈ keys(typelist) ? typelist[vecinfo.type] : "-"
     if (vecinfo.flags & VF_REAL) != 0
         vreal = copy(unsafe_wrap(Array, vecinfo.realdata, (len,)))
         return vname, vtype, vreal
