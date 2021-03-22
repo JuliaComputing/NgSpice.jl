@@ -1,4 +1,6 @@
 # Skipping MacroDefinition: IMPEXP __declspec ( dllimport )
+using Dates
+
 const ngcomplex_t = Complex{Cdouble}
 
 const VF_REAL = (1 << 0)
@@ -72,6 +74,11 @@ function sendchar(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
     println(text)
+    # write the `text` to a log file as it isn't `print`ed to the REPL 
+    # in a non-native environment
+    open("log_$(Dates.format(now(), "yyyy_mm_ddTHH")).txt", "a") do f
+        write(f, "$(Dates.format(now(), "MM:SS")): "*text*"\n")
+    end
     occursin(r"stderr Error:"i, text) && (ngerrorf = 1)
     return 0
 end
@@ -83,6 +90,11 @@ function sendstat(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
     println(text)
+    # write the `text` to a log file as it isn't `print`ed to the REPL 
+    # in a non-native environment
+    open("log_$(Dates.format(now(), "yyyy_mm_ddTHH")).txt", "a") do f
+        write(f, "$(Dates.format(now(), "MM:SS")): "*text*"\n")
+    end
     return 0
 end
 
@@ -110,13 +122,8 @@ end
 gen_pcontrolledexit() = @cfunction($controlledexit, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid}))
 pcontrolledexit       = gen_pcontrolledexit() 
 
-function senddata(vecdata::Ptr{vecvaluesall}, novecs::Cint, 
+function senddata(vecdata::Ptr{vecinfoall},
     id::Cint, userdata::Ptr{Cvoid})::Cint
-    allvecdata = []
-    for i in range(0, stop=novecs)
-        append!(allvecdata, unsafe_load(vecdata.vecsa))
-    end
-    #println(allvecdata)
     return 0
 end
 
@@ -124,50 +131,25 @@ gen_psenddata() = @cfunction($senddata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}
 psenddata       = gen_psenddata() 
 
 function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
+    #=
+    This bit is problematic because it always returns C_NULLs even before 
+    `data.veccount` number of `vecinfo`s are passed.
+    Even when that is handled it's o/p is always `nothing` 
+    and array of `nothing`s
+
     initdata == C_NULL && throw("No initialized data")
     data = unsafe_load(initdata)
     vec = unsafe_wrap(Array, data.vecs, (data.veccount, ))
-    #println("-----SendInit-------")
     for v in vec
-        v.name == C_NULL && return 0
-        println("Vector: $(unsafe_string(v.name))")
-    end
-    return 0
+        v.name == C_NULL && return zero(Int32)
+        vname = unsafe_string(v.name)
+        vpdvec = unsafe_wrap(Array, v.pdvec, 10)
+        vpdscale = unsafe_wrap(Array, v.pdvecscale, 10)
+        println(vname, vpdscale, vpdvec)
+    end=#
+
+    return zero(Int32)
 end
 
 gen_psendinitdata() = @cfunction($sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
 psendinitdata       = gen_psendinitdata() 
-
-#### TBD: Do we still need these `_wrappers` and `FnTypeSignatures`?
-#=const FnTypeSignatures = Dict(
-    :SendChar        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
-    :SendStat        => (:Cint, :((Ptr{Char}, Cint, Ptr{Cvoid}))),
-    :ControlledExit  => (:Cint, :((Cint, Cint, Cint, Cint, Ptr{Cvoid}))),
-    :SendData        => (:Cint, :((Ptr{vecvaluesall}, Cint, Cint, Ptr{Cvoid}))),
-    :SendInitData    => (:Cint, :((Ptr{vecinfoall}, Cint, Ptr{Cvoid}))),
-    :BGThreadRunning => (:Cint, :((Cint, Cint, Ptr{Cvoid}))),
-    :GetVSRCData     => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
-    :GetISRCData     => (:Cint, :((Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid}))),
-    :GetSyncData     => (:Cint, :((Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})))
-)
-
-SendChar_wrapper(fp::Ptr{Cvoid}) = fp
-SendStat_wrapper(fp::Ptr{Cvoid}) = fp
-ContolledExit_wrapper(fp::Ptr{Cvoid}) = fp
-SendData_wrapper(fp::Ptr{Cvoid}) = fp
-SendInitData_wrapper(fp::Ptr{Cvoid}) = fp
-BGThreadRunning_wrapper(fp::Ptr{Cvoid}) = fp
-=#
-
-#### TBD
-#=GetVSRCData_wrapper(fp::Ptr{Cvoid}) = fp
-GetVSRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})).ptr
-
-
-GetISRCData_wrapper(fp::Ptr{Cvoid}) = fp
-GetISRCData_wrapper(f) = @cfunction($f, Cint, (Ptr{Cdouble}, Cdouble, Ptr{Cchar}, Cint, Ptr{Cvoid})).ptr
-
-
-GetSyncData_wrapper(fp::Ptr{Cvoid}) = fp
-GetSyncData_wrapper(f) = @cfunction($f, Cint, (Cdouble, Ptr{Cdouble}, Cdouble, Cint, Cint, Cint, Ptr{Cvoid})).ptr
-=#
