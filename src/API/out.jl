@@ -23,10 +23,10 @@ end
 function print(params)
     if !occursin("-", params[1])
         veclist = getrealvec.(params)
-        DataFrame(Dict(zip(params, veclist))) |> print
+        DataFrame(Dict(zip(params, veclist))) |> Base.print
     else
         getthisvec = _vecswitch(params[1])
         veclist = getthisvec.(params[2:end])
-        DataFrame(Dict(zip(params[2:end], veclist[2:end]))) |> print
+        DataFrame(Dict(zip(params[2:end], veclist[2:end]))) |> Base.print
     end
 end
