@@ -1,14 +1,14 @@
 using DataFrames
 
 function display()
-    Base.print("\n--- The vectors current plot $(curplot()) ---\n")
+    println("\n--- The vectors current plot $(curplot()) ---\n")
     veclist = listcurvecs()
     df = DataFrame(Name = String[], Type = String[], DataType = Type[], Length = Int[])
     for v in veclist
         vname, vtype, vdata = getvec(v)
-        push!(df, (vname, vtype, typeof(vdata), sizeof(vdata)))
+        push!(df, (vname, vtype, typeof(vdata), length(vdata)))
     end
-    df |> Base.print
+    df |> println
 end
 
 function _vecswitch(vecstr)
@@ -23,10 +23,10 @@ end
 function print(params)
     if !occursin("-", params[1])
         veclist = getrealvec.(params)
-        DataFrame(Dict(zip(params, veclist))) |> Base.print
+        DataFrame(Dict(zip(params, veclist))) |> println
     else
         getthisvec = _vecswitch(params[1])
         veclist = getthisvec.(params[2:end])
-        DataFrame(Dict(zip(params[2:end], veclist[2:end]))) |> Base.print
+        DataFrame(Dict(zip(params[2:end], veclist[2:end]))) |> println
     end
 end

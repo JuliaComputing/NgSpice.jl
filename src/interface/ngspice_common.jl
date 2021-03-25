@@ -136,7 +136,7 @@ function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
     `data.veccount` number of `vecinfo`s are passed.
     Even when that is handled it's o/p is always `nothing` 
     and array of `nothing`s
-
+    
     initdata == C_NULL && throw("No initialized data")
     data = unsafe_load(initdata)
     vec = unsafe_wrap(Array, data.vecs, (data.veccount, ))
@@ -146,8 +146,8 @@ function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
         vpdvec = unsafe_wrap(Array, v.pdvec, 10)
         vpdscale = unsafe_wrap(Array, v.pdvecscale, 10)
         println(vname, vpdscale, vpdvec)
-    end=#
-
+    end
+    =#
     return zero(Int32)
 end
 
