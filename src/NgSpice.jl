@@ -41,9 +41,8 @@ export get_vector_info,
        curplot, listallplots, listallvecs, listcurvecs, getimagvec, 
        getmagnitudevec, getphasevec, getvec, getrealvec,
        NgSpiceGraphs, graph,
-       load_netlist, source,
-       display, print, 
-       bghalt, bgrun, cmd, init, run, stop, resume, reset, exit,
+       load_netlist, 
+       bghalt, bgrun, cmd, init,
        interactive
        #isrunning,
 end
