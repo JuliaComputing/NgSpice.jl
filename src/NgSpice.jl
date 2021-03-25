@@ -13,11 +13,11 @@ include("interface/ngspice_common.jl")
 include("interface/ngspice_api.jl")
 
 #= Might not be necessary
-export bgthreadrunning, controlledexit, #getISRCdata, detsyncdata, getVSRCdata, 
+export bgthreadrunning, controlledexit, #getISRCdata, detsyncdata, getVSRCdata,
        sendchar, senddata, sendstat, sendinitdata=#
 
 export gen_pbgthread, gen_pcontrolledexit, gen_psendchar, gen_psenddata,
-       gen_psendinitdata, gen_psendstat, 
+       gen_psendinitdata, gen_psendstat,
        pbgthread, pcontrolledexit, psendchar, psenddata, psendinitdata,
        psendstat
 
