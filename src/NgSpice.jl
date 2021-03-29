@@ -12,14 +12,11 @@ export Ctm, Ctime_t, Cclock_t
 include("interface/ngspice_common.jl")
 include("interface/ngspice_api.jl")
 
-#= Might not be necessary
 export bgthreadrunning, controlledexit, #getISRCdata, detsyncdata, getVSRCdata,
-       sendchar, senddata, sendstat, sendinitdata=#
+       sendchar, senddata, sendstat, sendinitdata
 
 export gen_pbgthread, gen_pcontrolledexit, gen_psendchar, gen_psenddata,
        gen_psendinitdata, gen_psendstat,
-       pbgthread, pcontrolledexit, psendchar, psenddata, psendinitdata,
-       psendstat
 
 foreach(names(@__MODULE__, all=true)) do s
     if startswith(string(s), "ng")
@@ -41,8 +38,8 @@ export get_vector_info,
        curplot, listallplots, listallvecs, listcurvecs, getimagvec, 
        getmagnitudevec, getphasevec, getvec, getrealvec,
        NgSpiceGraphs, graph,
-       load_netlist, 
-       bghalt, bgrun, cmd, init,
+       load_netlist, source, 
+       bghalt, bgrun, cmd, init, 
        interactive
        #isrunning,
 end
