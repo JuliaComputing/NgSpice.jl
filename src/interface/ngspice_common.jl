@@ -69,16 +69,21 @@ end
 #const pvecinfoall = Ptr{vecinfoall}
 
 ngerrorf, bgrunningf, vecgetnum = 0, 0, 0
+function std_print(text)
+    occursin("stdout", text) && 
+        (println(text[8:end]); return)
+    (occursin("stderr", text) && !occursin("viewport", text)) &&
+        (println(text[8:end]); return)
+    occursin("viewport", text) && 
+        (println("\nPlotting is skipped. To plot automatically run `plot_parser()`\n")
+                ; return)
+    println(text)
+end
 
 function sendchar(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
-    println(text)
-    # write the `text` to a log file as it isn't `print`ed to the REPL
-    # in a non-native environment
-    open("log_$(Dates.format(now(), "yyyy_mm_ddTHH")).txt", "a") do f
-        write(f, "$(Dates.format(now(), "MM:SS")): "*text*"\n")
-    end
+    std_print(text)
     occursin(r"stderr Error:"i, text) && (ngerrorf = 1)
     return 0
 end
@@ -88,12 +93,7 @@ gen_psendchar() = @cfunction(sendchar, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
 function sendstat(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
     _text != C_NULL || throw("Not a valid text")
     text = unsafe_string(_text)
-    println(text)
-    # write the `text` to a log file as it isn't `print`ed to the REPL
-    # in a non-native environment
-    open("log_$(Dates.format(now(), "yyyy_mm_ddTHH")).txt", "a") do f
-        write(f, "$(Dates.format(now(), "MM:SS")): "*text*"\n")
-    end
+    std_print(text)
     return 0
 end
 
