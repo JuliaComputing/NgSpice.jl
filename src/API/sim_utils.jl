@@ -5,3 +5,5 @@ function load_netlist(netpath::String)
 end
 
 source(netpath) = cmd("source $netpath")
+
+display() = cmd("display")

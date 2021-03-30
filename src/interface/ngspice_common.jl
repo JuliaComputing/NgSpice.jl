@@ -75,7 +75,7 @@ function std_print(text)
     (occursin("stderr", text) && !occursin("viewport", text)) &&
         (println(text[8:end]); return)
     occursin("viewport", text) && 
-        (println("\nPlotting is skipped. To plot automatically run `plot_parser()`\n")
+        (println("\nPlotting is skipped.\n")
                 ; return)
     println(text)
 end

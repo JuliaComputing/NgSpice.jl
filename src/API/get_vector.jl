@@ -1,4 +1,5 @@
 function get_vector_info(vecname, maxlen=Int(maxintfloat()))
+    occursin("*", vecname) && (vecname = split(vecname, "*")[2])
     vec = ngGet_Vec_Info(vecname)
     vec != C_NULL || throw("Vector $(vecname) not found")
     vecinfo = unsafe_load(vec)
