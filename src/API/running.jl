@@ -1,4 +1,4 @@
-cmd(command) = ngSpice_Command(command) #should typeof(command) be restricted
+cmd(command) = ngSpice_Command(command) 
 
 init()      = (pvoid = convert(Ptr{Nothing}, 0);
                 ngSpice_Init(gen_psendchar(), gen_psendstat(),
@@ -7,17 +7,20 @@ init()      = (pvoid = convert(Ptr{Nothing}, 0);
                 gen_psendinitdata(),
                 gen_pbgthread(), pvoid))
 
-# isrunning() = ngSpice_running() # always returns 0
+isrunning() = ngSpice_running() # always returns 0
 
-run()     = cmd("run")
-bgrun()   = cmd("bg_run")
+run()     = (println("Running the simulator"); cmd("run"))
+bgrun()   = (println("Running the simulator in a background thread");
+                cmd("bg_run"))
 
 set_breakpoint(bkpt::Float64) = ngSpice_SetBkpt(bkpt)
 
-stop()    = cmd("stop")
-bghalt()  = cmd("bg_halt")
+stop()    = (println("Stopping the simulator"); cmd("stop"))
+bghalt()  = (println("Halting the simulator in a background thread");
+                cmd("bg_halt"))
 
-reset()   = cmd("reset")
-resume()  = cmd("resume")
+reset()   = (println("Resetting the simulator"); cmd("reset"))
+resume()  = (println("Resuming the simulator"); cmd("resume"))
 
-exit()    = cmd("unset askquit")
+quit()    = n.cmd("quit")
+exit()    = (println("Quitting immediately"); cmd("unset askquit"))
