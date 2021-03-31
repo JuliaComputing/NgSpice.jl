@@ -1,5 +1,9 @@
 function get_vector_info(vecname, maxlen=Int(maxintfloat()))
-    occursin("*", vecname) && (vecname = split(vecname, "*")[2])
+    factor = 1.0
+    if occursin("*", vecname)
+        factor, vecname = split(vecname, "*")
+        factor = parse(Float64, factor)
+    end
     vec = ngGet_Vec_Info(vecname)
     vec != C_NULL || throw("Vector $(vecname) not found")
     vecinfo = unsafe_load(vec)
@@ -14,10 +18,10 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     vtype = vecinfo.type ∈ keys(typelist) ? typelist[vecinfo.type] : "-"
     if (vecinfo.flags & VF_REAL) != 0
         vreal = copy(unsafe_wrap(Array, vecinfo.realdata, (len,)))
-        return vname, vtype, vreal
+        return vname, vtype, vreal*factor
     elseif (vecinfo.flags & VF_COMPLEX) != 0
         vcomplex = copy(unsafe_wrap(Array, vecinfo.compdata, (len,)))
-        return vname, vtype, vcomplex
+        return vname, vtype, vcomplex*factor
     else
         error("Unknown vector type")
     end
