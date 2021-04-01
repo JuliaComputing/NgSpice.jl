@@ -15,12 +15,18 @@ In a Julia REPL,
 ] add https://github.com/JuliaComputing/NgSpice.jl
 using NgSpice
 ```
+---
+
 To start an an interactive mode,
-- Run `NgSpice.interactive()` in REPL
+```
+using Plots
+NgSpice.interactive()`
+```
 
 - Hit `~` for initializing the NgSpice
 
-An example circuit:
+Run the Ngspice simulations commands! <br>
+For example:
 ```
 source /filepath/netlist # without quotes
 display                  # prints all vectors and constants
@@ -28,10 +34,11 @@ plot vector1 vector2     # plots the real part of vector by default
 ```
 
 
-Note: It is not necessary for `.cir` to be placed in `bin` folder as long as full path is specified.
+*Note*: It is not necessary for `.cir` to be placed in `bin` folder as long as full path is specified.
 
----
-Plotting syntax:  `plot -x space seperated vectorlist` where `x` takes following modes:
+Additional to usual plot parameters, different modes of retrieval can be set with:<br>
+  `plot -x space seperated vectorlist` <br>
+  where `x` takes following modes:
 
 | Modes | Description |
 |---------|-------|
@@ -40,6 +47,12 @@ Plotting syntax:  `plot -x space seperated vectorlist` where `x` takes following
 | -m, --magnitude | Magnitude of vector |
 | -p, --phase | Phase of vector |
 
-> Other commands to run an NgSpice simulation can be found [here](http://ngspice.sourceforge.net/docs/ngspice-html-manual/manual.xhtml#magicparlabel-21623). <br>
-All commands that NgSpice allows can be found [here](http://ngspice.sourceforge.net/docs/ngspice-html-manual/manual.xhtml#sec_Commands).
+---
+For a non-interactive and more Julia-like experience checkout this [tutorial](tutorials\mosfet.jl).
 
+Additionally, to simulate a `complex_circuit.sp` file with multiple plotting statements, run
+```
+using NgSpice
+using Plots
+source_sp("path/to/the/complex_circuit.sp")
+```
