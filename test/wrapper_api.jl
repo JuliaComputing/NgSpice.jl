@@ -15,3 +15,10 @@ end
 @testset "exit" begin
     @test NgSpice.exit() == 0
 end
+
+@testset "passing circuit as an array" begin
+    init()
+    netlist = readlines(netpath)
+    @test load_netlist(netlist) == 0
+    NgSpice.exit()
+end
