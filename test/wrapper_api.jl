@@ -1,3 +1,9 @@
+using NgSpice
+using Test
+
+rootdir = joinpath(@__DIR__, "..")
+netpath = joinpath(rootdir, "inputs", "mosfet.cir")
+
 @testset "initialize" begin
     init()
     @test source(netpath) == 0
