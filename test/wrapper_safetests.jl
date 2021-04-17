@@ -1,6 +1,8 @@
 using NgSpice
 using Test
+
 NgSpice.init()
+
 nl = """
 * Diode test circuit
 V1 inp 0 DC=1 AC=1 SIN(1 1 1000)
@@ -10,5 +12,5 @@ D1 inp 0 dmod
 .save all @d1[id] @d1[cd] @d1[charge] @d1[vd]
 .END
 """
-# Segfaults:
-@test NgSpice.load_netlist_str(nl)
+
+@test NgSpice.load_netlist(nl) == 0
