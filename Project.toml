@@ -1,7 +1,7 @@
 name = "NgSpice"
 uuid = "1a64e563-3ad9-44a2-8713-a1728bea8a90"
 authors = ["Venkateshprasad Bhat"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
