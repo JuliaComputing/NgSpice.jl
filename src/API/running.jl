@@ -1,11 +1,17 @@
-cmd(command) = ngSpice_Command(command) 
+cmd(command) = ngSpice_Command(command)
 
-init()      = (pvoid = convert(Ptr{Nothing}, 0);
-                ngSpice_Init(gen_psendchar(), gen_psendstat(),
-                gen_pcontrolledexit(),
-                gen_psenddata(),
-                gen_psendinitdata(),
-                gen_pbgthread(), pvoid))
+function init()
+    pvoid = convert(Ptr{Nothing}, 0)
+    ngSpice_Init(gen_psendchar(), gen_psendstat(),
+        gen_pcontrolledexit(),
+        gen_psenddata(),
+        gen_psendinitdata(),
+        gen_pbgthread(), pvoid)
+    ngSpice_Init_JLExtensions(
+        @cfunction(path_resolve, Cstring, (Cstring, Cstring))
+    )
+
+end
 
 isrunning() = ngSpice_running() # always returns 0
 
