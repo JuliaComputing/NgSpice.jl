@@ -28,5 +28,5 @@ bghalt()  = (println("Halting the simulator in a background thread");
 reset()   = (println("Resetting the simulator"); cmd("reset"))
 resume()  = (println("Resuming the simulator"); cmd("resume"))
 
-quit()    = n.cmd("quit")
+quit()    = cmd("quit")
 exit()    = (println("Quitting immediately"); cmd("unset askquit"))
