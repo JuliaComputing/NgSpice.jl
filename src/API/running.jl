@@ -29,4 +29,4 @@ reset()   = (println("Resetting the simulator"); cmd("reset"))
 resume()  = (println("Resuming the simulator"); cmd("resume"))
 
 quit()    = cmd("quit")
-exit()    = (println("Quitting immediately"); cmd("unset askquit"))
+exit()    = (println("Quitting immediately"); cmd("unset askquit"); cmd("quit"))
