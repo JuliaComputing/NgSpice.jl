@@ -12,10 +12,28 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     typelist = Dict(0 => "notype",
                     1 => "time",
                     2 => "frequency",
-                    3 => "current",
-                    4 => "voltage",
-                    16 => "impedence")
-    vtype = vecinfo.type ∈ keys(typelist) ? typelist[vecinfo.type] : "-"
+                    3 => "voltage",
+                    4 => "current",
+                    5 => "voltage density",
+                    6 => "current density",
+                    7 => "sqr voltage density",
+                    8 => "sqr current density",
+                    9 => "sqr voltage",
+                    10 => "sqr current",
+                    11 => "pole",
+                    12 => "zero",
+                    13 => "sparam",
+                    14 => "temp",
+                    15 => "res",
+                    16 => "impedence",
+                    17 => "admittance",
+                    18 => "power",
+                    19 => "phase",
+                    20 => "db",
+                    21 => "capacitance",
+                    22 => "charge",
+                    )
+    vtype = get(typelist, vecinfo.type, "-")
     if (vecinfo.flags & VF_REAL) != 0
         vreal = copy(unsafe_wrap(Array, vecinfo.realdata, (len,)))
         return vname, vtype, vreal*factor
