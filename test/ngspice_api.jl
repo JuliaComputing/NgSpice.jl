@@ -12,5 +12,4 @@ netpath = joinpath(rootdir, "inputs", "mosfet.cir")
     @test ngSpice_Command("run") == 0
     @test typeof(ngSpice_AllPlots()) == Ptr{Ptr{UInt8}}
     @test ngSpice_running() == 0
-    @test ngSpice_Command("unset askquit") == 0
 end
