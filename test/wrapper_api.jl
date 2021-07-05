@@ -11,8 +11,10 @@ netpath = joinpath(rootdir, "inputs", "mosfet.cir")
 end
 
 @testset "getvectors" begin
-    @test curplot() == "tran1"
-    @test listallplots() == ["tran1", "const"]
+    # as this simulation runs after the one in `ngspice_api.jl`, 
+    # `tran2` is the current plot
+    @test curplot() == "tran2"
+    @test listallplots() == ["tran2", "tran1", "const"]
     @test collect(keys(listallvecs())) == collect(sort(listallplots()))
     @test listallvecs()[curplot()] == listcurvecs()
     @test getvec.(listcurvecs()) == get_vector_info.(listcurvecs())
@@ -26,13 +28,7 @@ end
     @test getvec("time")[2] == "time"
 end
 
-@testset "exit" begin
-    @test NgSpice.exit() == 0
-end
-
 @testset "passing circuit as an array" begin
-    init()
     netlist = readlines(netpath)
     @test load_netlist(netlist) == 0
-    NgSpice.exit()
 end
