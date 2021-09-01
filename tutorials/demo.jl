@@ -3,7 +3,7 @@
 import NgSpice
 n = NgSpice
 
-netpath = joinpath(@__DIR__, "..", "inputs/ac_ascii.cir") |> normpath
+netpath = joinpath(@__DIR__, "..", "inputs", "ac_ascii.cir") |> normpath
 
 n.init()
 n.cmd("source $netpath")
