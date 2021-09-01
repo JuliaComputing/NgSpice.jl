@@ -17,7 +17,7 @@ q1 coll base emit generic
 rcollector vcc coll 3.9k  
 remitter emit 0 1k
 *
-.probe v(emit) v(vcc) v(1) v(base) v(coll)
+.probe v(emit) v(vcc) v(1) v(base) v(coll) vcc#branch vin#branch
 .model generic npn  
 *    
 .end
