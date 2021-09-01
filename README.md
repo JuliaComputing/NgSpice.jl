@@ -20,7 +20,7 @@ using NgSpice
 To start an an interactive mode,
 ```
 using Plots
-NgSpice.interactive()`
+NgSpice.interactive()
 ```
 
 - Hit `~` for initializing the NgSpice
