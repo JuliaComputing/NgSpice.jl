@@ -6,30 +6,15 @@ struct NgSpiceGraphs end
 
 const graph = NgSpiceGraphs()
 
-@recipe function ng(::NgSpiceGraphs, fort, veclist, title, xlims=nothing)
-    ft = getrealvec(fort)
-    legend := true
-    grid := true
-    title := "$title"
-    background_color --> Colors.RGB(0.0, 0.0, 0.0)
-    xguide := fort
-    guide := String.(veclist)
-    color_palette --> :default
-    seriestype := :path
-    overwrite_figure := false
-    vec = getrealvec.(veclist)
-    #isa(xlims, Nothing) || xlims := xlims
-    ft, vec
-end
-
+# `fort` is frequency or time vector. It is the `X` axis and should always be real.
 @recipe function ng(::NgSpiceGraphs, vectype, fort, veclist, title, xlims=nothing)
     ft = getrealvec(fort)
-    legend := true
+    label := permutedims(veclist)
     grid := true
     title := "$title"
     background_color --> Colors.RGB(0.0, 0.0, 0.0)
     xguide := fort
-    guide := String.(veclist)
+    guide := length(veclist) > 1 ? "signals" : "signal"
     color_palette --> :default
     seriestype := :path
     overwrite_figure := false
