@@ -13,3 +13,6 @@ end
 @safetestset "wrapper safetests" begin
     include("wrapper_safetests.jl")
 end
+
+using Aqua
+Aqua.test_all(NgSpice; undefined_exports = false, stale_deps = false)
