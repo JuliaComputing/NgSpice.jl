@@ -13,7 +13,7 @@ Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 ngspice_jll = "57e080ce-e004-5ece-a144-c95753423b2a"
 
 [compat]
-CEnum = "0.4"
+CEnum = "0.4, 0.5"
 Colors = "0.12"
 RecipesBase = "1.1"
 ReplMaker = "0.2"
