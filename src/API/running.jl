@@ -28,5 +28,7 @@ bghalt()  = (println("Halting the simulator in a background thread");
 reset()   = (println("Resetting the simulator"); cmd("reset"))
 resume()  = (println("Resuming the simulator"); cmd("resume"))
 
+alter(command::String) = cmd(string("alter ", command))
+
 quit()    = cmd("quit")
 exit()    = (println("Quitting immediately"); cmd("unset askquit"); cmd("quit"))

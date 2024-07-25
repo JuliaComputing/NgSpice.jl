@@ -46,6 +46,6 @@ export get_vector_info,
        NgSpiceGraphs, graph,
        load_netlist, source, source_sp,
        bghalt, bgrun, cmd, init,
-       interactive
+       interactive, alter
        #isrunning,
 end
