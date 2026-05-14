@@ -31,8 +31,8 @@ include("API/sim_utils.jl")
 include("API/running.jl")
 
 function __init__()
-    @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" @eval include("API/repl.jl")
-    @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" @eval include("API/graphs.jl")
+#    @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" @eval include("API/repl.jl")
+#    @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" @eval include("API/graphs.jl")
 
     # Ensure that NgSpice is initialized, as otherwise it's easy to get segfaults
     # because NgSpice expects a printf callback to be provided (as we do in the
