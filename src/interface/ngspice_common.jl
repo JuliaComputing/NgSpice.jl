@@ -1,4 +1,3 @@
-# Skipping MacroDefinition: IMPEXP __declspec ( dllimport )
 
 const ngcomplex_t = Complex{Cdouble}
 
@@ -10,6 +9,8 @@ const VF_PRINT = (1 << 4)
 const VF_MINGIVEN = (1 << 5)
 const VF_MAXGIVEN = (1 << 6)
 const VF_PERMANENT = (1 << 7)
+
+
 
 """
  Vector info obtained from any vector in ngspice.dll.
@@ -53,8 +54,8 @@ struct vecinfo
     pdvecscale::Ptr{Cvoid} # a void pointer to struct dvec *ds, the scale vector
 
 end
-
 const pvecinfo = Ptr{vecinfo}
+
 
 struct vecinfoall
     name::Cstring
@@ -64,85 +65,5 @@ struct vecinfoall
     veccount::Cint
     vecs::pvecinfo
 end
+const pvecinfoall = Ptr{vecinfoall}
 
-#const pvecinfoall = Ptr{vecinfoall}
-
-ngerrorf, bgrunningf, vecgetnum = 0, 0, 0
-function std_print(text)
-    occursin("stdout", text) && 
-        (println(text[8:end]); return)
-    (occursin("stderr", text) && !occursin("viewport", text)) &&
-        (println(text[8:end]); return)
-    occursin("viewport", text) && 
-        (println("\nPlotting is skipped.\n")
-                ; return)
-    println(text)
-end
-
-function sendchar(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
-    _text != C_NULL || throw("Not a valid text")
-    text = unsafe_string(_text)
-    std_print(text)
-    occursin(r"stderr Error:"i, text) && (ngerrorf = 1)
-    return 0
-end
-
-gen_psendchar() = @cfunction(sendchar, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
-
-function sendstat(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
-    _text != C_NULL || throw("Not a valid text")
-    text = unsafe_string(_text)
-    std_print(text)
-    return 0
-end
-
-gen_psendstat() = @cfunction(sendstat, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
-
-function bgthreadrunning(run::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
-    bgrunning = run
-    run ? println("BG thread is not running") :
-        println("BG thread is running")
-    return 0
-end
-
-gen_pbgthread() = @cfunction(bgthreadrunning, Cint, (Cint, Cint, Ptr{Cvoid}))
-
-function controlledexit(exitstatus::Cint, immediate::Cint,
-    quitexit::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
-    quitexit == 1 && println("Returned from quit with exit status")
-    immediate == 1 ? (println("Unloading NgSpice"); ngSpice_Command("quit")) :
-        (println("Prepare an unload"); will_unload = 1)
-    return exitstatus
-end
-
-gen_pcontrolledexit() = @cfunction(controlledexit, Cint, (Cint, Cint, Cint, Cint, Ptr{Cvoid}))
-
-function senddata(vecdata::Ptr{vecinfoall},
-    id::Cint, userdata::Ptr{Cvoid})::Cint
-    return 0
-end
-
-gen_psenddata() = @cfunction(senddata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
-
-function sendinitdata(initdata::Ptr{vecinfoall}, id::Cint, userdata::Ptr{Cvoid})
-    #=
-    This bit is problematic because it always returns C_NULLs even before
-    `data.veccount` number of `vecinfo`s are passed.
-    Even when that is handled it's o/p is always `nothing`
-    and array of `nothing`s
-    
-    initdata == C_NULL && throw("No initialized data")
-    data = unsafe_load(initdata)
-    vec = unsafe_wrap(Array, data.vecs, (data.veccount, ))
-    for v in vec
-        v.name == C_NULL && return zero(Int32)
-        vname = unsafe_string(v.name)
-        vpdvec = unsafe_wrap(Array, v.pdvec, 10)
-        vpdscale = unsafe_wrap(Array, v.pdvecscale, 10)
-        println(vname, vpdscale, vpdvec)
-    end
-    =#
-    return zero(Int32)
-end
-
-gen_psendinitdata() = @cfunction(sendinitdata, Cint, (Ptr{vecinfoall}, Cint, Ptr{Cvoid}))
