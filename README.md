@@ -1,58 +1,84 @@
-# NgSpice
-
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaComputing.github.io/NgSpice.jl/stable)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaComputing.github.io/NgSpice.jl/dev)
-[![Build Status](https://github.com/JuliaComputing/NgSpice.jl/workflows/CI/badge.svg)](https://github.com/JuliaComputing/NgSpice.jl/actions)
-[![Coverage](https://codecov.io/gh/JuliaComputing/NgSpice.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaComputing/NgSpice.jl)
+# NgHerb -- A Revision of NgSpice
 
 
-This repository provides a Julia wrapper for NgSpice library.
+This repository provides a Julia wrapper for NgSpice library. It's based on the 
+[NgSpice](https://github.com/JuliaComputing/NgSpice.jl) Julia module by Venkateshprasad Bhat. 
+NgHerb implements these changes:
+
+* Thread safety for NgSpice callbacks, to resolve segfaults in Julia 12.6+
+* Removed unused callbacks
+* Removed REPL and Plot features for easier maintenance
+
+NgHerb has some additional streamlining compared to NgSpice. 
+
+The main purpose is to provide a minimal `ngspice` library wrapper that works stably with more recent
+Julia versions. As of Julia 12.6, the original NgSpice module is broken unless
+Julia is constrained to one thread, i.e. `julia -t 1`. NgHerb tries to fix this by
+introducing a CircularBuffer to manage asyncrhonous output from the `ngspice`.
+
 
 ## Usage:
 
 In a Julia REPL,
 ```
-] add https://github.com/JuliaComputing/NgSpice.jl
-using NgSpice
+] add https://github.com/cjwinstead/NgHerb.jl
+using NgHerb
 ```
 ---
 
-To start an an interactive mode,
-```
-using Plots
-NgSpice.interactive()
-```
+Upon initialization, you shold see a startup message from the `ngspice` library, something
+like this:
 
-- Hit `~` for initializing the NgSpice
-
-Run the Ngspice simulations commands! <br>
-For example:
 ```
-source /filepath/netlist # without quotes
-display                  # prints all vectors and constants
-plot vector1 vector2     # plots the real part of vector by default
+******
+** ngspice-46 shared library
+** Creation Date: Tue May 12 23:05:42 UTC 2026
+******
 ```
 
+### Basic Functions
 
-*Note*: It is not necessary for `.cir` to be placed in `bin` folder as long as full path is specified.
+To load a netlist and run analyses in `ngspice`, use:
 
-Additional to usual plot parameters, different modes of retrieval can be set with:<br>
-  `plot -x space seperated vectorlist` <br>
-  where `x` takes following modes:
+* `NgHerb.load_netlist(String)` -- loads a netlist from a multi-line Julia String
+* `NgHerb.cmd(String)` -- run an `ngspice` command.
 
-| Modes | Description |
-|---------|-------|
-| -r, --real | Real part of vector|
-| -i, --imaginary | Imaginary part of vector |
-| -m, --magnitude | Magnitude of vector |
-| -p, --phase | Phase of vector |
+To retrieve data from `ngspice`, use:
 
----
-For a non-interactive and more Julia-like experience checkout this [tutorial](tutorials\mosfet.jl).
+* `NgHerb.getrealvec(String)` -- get the named vector 
+* `NgHerb.getmagnitudevec(String)` -- get the magnitude of a complex vector
+* `NgHerb.getphasevec(String)` -- get the phase of a complex vector (radians)
 
-Additionally, to simulate a `complex_circuit.sp` file with multiple plotting statements, run
+
+```julia-repl
+julia> netlist="""
+* Demo circuit
+
+V1 1 0 DC 1
+R1 1 2 1k
+R2 2 0 2k
+
+.end
+""";
+
+julia> NgHerb.load_netlist(netlist)
+Circuit: * Demo circuit
+
+julia> NgHerb.cmd("op")
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+Using SPARSE 1.3 as Direct Linear Solver
+No. of Data Rows : 1
+
+julia> NgHerb.cmd("print all");
+
+v(1) = 1.000000e+00
+v(2) = 6.666667e-01
+v1#branch = -3.33333e-04
+
+julia> NgHerb.getrealvec("2")
+1-element Vector{Float64}:
+ 0.6666666666666666
+
 ```
-using NgSpice
-using Plots
-source_sp("path/to/the/complex_circuit.sp")
-```
+
