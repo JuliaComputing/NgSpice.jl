@@ -82,3 +82,19 @@ julia> NgHerb.getrealvec("2")
 
 ```
 
+## String Macros
+
+Some special strings are defined to conveniently interface with `ngspice`:
+
+* `ng"..."` -- shorthand for NgHerb.cmd()
+* `vec"..."` -- returns the indicated vector (with name and type)
+
+These string types all return `Vector{Float64}`:
+
+* `real"..."` -- real part of the indicated `ngspice` vector
+* `imag"..."` -- imaginary part of the indicated `ngspice` vector
+* `magnitude"..."` -- complex magnitude of the indicated vector
+* `phase"..."` -- complex phase (in degrees)
+* `dB"..."` -- magnitude in dB20
+* `i"..."` -- real-valued branch current in the indicated voltage source
+

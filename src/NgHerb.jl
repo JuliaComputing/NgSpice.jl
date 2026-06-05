@@ -50,8 +50,11 @@ function __init__()
     @async begin
         try
             while isopen(async_cond[])
-                wait(async_cond[])
+                GC.gc()
 
+                wait(async_cond[])
+                GC.enable(false)
+                
                 # Dump contents from ring buffer
                 buf_str = String(collect(string_buffer))
                 empty!(string_buffer)
@@ -64,6 +67,8 @@ function __init__()
 
                 # Print everything
                 println(String(take!(seekstart(io))))
+
+                GC.enable(true)
             end
         catch err
             @error "Error in AsyncCondition processing loop" exception=(err, catch_backtrace())
@@ -71,5 +76,53 @@ function __init__()
     end
     init()
 end
+
+
+
+#================ Special Strings =====================#
+# ng"" sends the quoted command to the simulator
+macro ng_str(s)
+    NgHerb.cmd(s)    
+end
+
+# real"" retrieves the real-valued part of the indicated vector
+macro real_str(s)
+    NgHerb.getrealvec(s)
+end
+
+# imag"" retrieves the imaginary-valued part of the indicated vector
+macro imag_str(s)
+    NgHerb.getimaginaryvec(s)
+end
+
+# i"" retrieves the current in the indicated voltage source
+macro i_str(s)
+    NgHerb.getrealvec(s*"#branch")
+end
+
+# magnitude"" retrieves the complex magnitude of the indicated vector
+macro magnitude_str(s)
+    NgHerb.getmagnitudevec(s)
+end
+
+# dB"" retrieves a magnitude vector and converts to dB20
+macro dB_str(s)
+    20.0 .* log10.(NgHerb.getmagnitudevec(s))
+end
+
+# phase"" retrieves a phase vector and converts to degrees
+macro phase_str(s)
+    (180/π).*NgHerb.getphasevec(s)
+end
+
+# vec"" returns a vector, possibly complex 
+macro vec_str(s)
+    NgHerb.getvec(s)
+end
+
+
+
+
+export @ng_str, @real_str, @imag_str, @i_str, @magnitude_str, @dB_str, @phase_str, @vec_str
 
 end
