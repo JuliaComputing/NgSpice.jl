@@ -50,10 +50,11 @@ function __init__()
     @async begin
         try
             while isopen(async_cond[])
+                GC.enable(true)
                 GC.gc()
+                GC.enable(false)
 
                 wait(async_cond[])
-                GC.enable(false)
                 
                 # Dump contents from ring buffer
                 buf_str = String(collect(string_buffer))
@@ -68,7 +69,7 @@ function __init__()
                 # Print everything
                 println(String(take!(seekstart(io))))
 
-                GC.enable(true)
+                
             end
         catch err
             @error "Error in AsyncCondition processing loop" exception=(err, catch_backtrace())
