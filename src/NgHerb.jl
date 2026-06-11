@@ -13,7 +13,7 @@ include("API/sim_utils.jl")
 include("API/running.jl")
 include("API/get_vector.jl")
 
-const async_cond    = Ref{Base.AsyncCondition}()
+#const async_cond    = Ref{Base.AsyncCondition}()
 string_buffer       = CircularBuffer{UInt8}(10000)
 
 # Callback pointers
@@ -32,7 +32,7 @@ data_pointer = Ptr{vecinfoall}(0)
 
 function __init__()
     
-    async_cond[] = Base.AsyncCondition()
+    #async_cond[] = Base.AsyncCondition()
 
     # We will just need these callbacks:
     gen_psendchar[]       = @cfunction(sendchar,       Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}                   ))
@@ -46,7 +46,15 @@ function __init__()
         push!(cbvec,x)
     end
 
-    # Asynchronous wait loop for ngspice library messages
+    init()
+
+    sleep(0.1)
+    dumpbuffer()
+end
+
+
+
+function callback_listener()
     @async begin
         try
             while isopen(async_cond[])
@@ -75,9 +83,27 @@ function __init__()
             @error "Error in AsyncCondition processing loop" exception=(err, catch_backtrace())
         end
     end
-    init()
 end
 
+
+function dumpbuffer()
+    try
+        # Dump contents from ring buffer
+        buf_str = String(collect(string_buffer))
+        empty!(string_buffer)
+        
+        # Remove "stdout " from start of lines
+        io=IOBuffer()
+        for l in eachsplit(buf_str,"\n")
+            println(io,replace(l,r"^stdout "=>""))
+        end
+        
+        # Print everything
+        println(String(take!(seekstart(io))))
+    catch err
+        @error "Error in AsyncCondition processing loop" exception=(err, catch_backtrace())
+    end
+end
 
 
 #================ Special Strings =====================#

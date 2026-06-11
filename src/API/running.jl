@@ -1,8 +1,15 @@
-cmd(command) = GC.@preserve command ngSpice_Command(command)
+
+
+function cmd(command)
+    GC.@preserve command ngSpice_Command(command)
+    sleep(0.1)
+    dumpbuffer()
+end    
 precompile(cmd,(String,))
 
+
 function init()
-    #pvoid = convert(Ptr{Nothing}, 0)
+
     ngSpice_Init(gen_psendchar[], gen_psendstat[],
         gen_pcontrolledexit[],
         gen_psenddata[],
