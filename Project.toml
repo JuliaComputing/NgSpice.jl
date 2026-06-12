@@ -7,6 +7,7 @@ authors = ["Chris Winstead", "Venkateshprasad Bhat"]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 ngspice_jll = "57e080ce-e004-5ece-a144-c95753423b2a"
 
+
 [compat]
 DataStructures = "0.19.5"
 ngspice_jll = "41.0.0"

@@ -13,7 +13,7 @@ include("API/sim_utils.jl")
 include("API/running.jl")
 include("API/get_vector.jl")
 
-#const async_cond    = Ref{Base.AsyncCondition}()
+const async_cond    = Ref{Base.AsyncCondition}()
 string_buffer       = CircularBuffer{UInt8}(10000)
 
 # Callback pointers
@@ -32,7 +32,7 @@ data_pointer = Ptr{vecinfoall}(0)
 
 function __init__()
     
-    #async_cond[] = Base.AsyncCondition()
+    async_cond[] = Base.AsyncCondition()
 
     # We will just need these callbacks:
     gen_psendchar[]       = @cfunction(sendchar,       Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}                   ))
@@ -46,10 +46,26 @@ function __init__()
         push!(cbvec,x)
     end
 
-    init()
 
-    sleep(0.1)
-    dumpbuffer()
+    callback_listener()
+    init()
+end
+
+
+
+function dumpbuffer()
+    # Dump contents from ring buffer
+    buf_str = String(collect(string_buffer))
+    empty!(string_buffer)
+    
+    # Remove "stdout " from start of lines
+    io=IOBuffer()
+    for l in eachsplit(buf_str,"\n")
+        println(io,replace(l,r"^stdout "=>""))
+    end
+    
+    # Print everything
+    println(String(take!(seekstart(io))))
 end
 
 
@@ -58,50 +74,13 @@ function callback_listener()
     @async begin
         try
             while isopen(async_cond[])
-                GC.enable(true)
-                GC.gc()
-                GC.enable(false)
-
                 wait(async_cond[])
-                
-                # Dump contents from ring buffer
-                buf_str = String(collect(string_buffer))
-                empty!(string_buffer)
-
-                # Remove "stdout " from start of lines
-                io=IOBuffer()
-                for l in eachsplit(buf_str,"\n")
-                    println(io,replace(l,r"^stdout "=>""))
-                end
-
-                # Print everything
-                println(String(take!(seekstart(io))))
-
-                
+                dumpbuffer()
+                GC.enable(true)                
             end
         catch err
             @error "Error in AsyncCondition processing loop" exception=(err, catch_backtrace())
         end
-    end
-end
-
-
-function dumpbuffer()
-    try
-        # Dump contents from ring buffer
-        buf_str = String(collect(string_buffer))
-        empty!(string_buffer)
-        
-        # Remove "stdout " from start of lines
-        io=IOBuffer()
-        for l in eachsplit(buf_str,"\n")
-            println(io,replace(l,r"^stdout "=>""))
-        end
-        
-        # Print everything
-        println(String(take!(seekstart(io))))
-    catch err
-        @error "Error in AsyncCondition processing loop" exception=(err, catch_backtrace())
     end
 end
 

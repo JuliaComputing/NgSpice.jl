@@ -1,15 +1,14 @@
 
 
-function cmd(command)
-    GC.@preserve command ngSpice_Command(command)
-    sleep(0.1)
-    dumpbuffer()
+function cmd(command::String)
+    GC.enable(false)
+    ngSpice_Command(command)
 end    
 precompile(cmd,(String,))
 
 
 function init()
-
+    GC.enable(false)
     ngSpice_Init(gen_psendchar[], gen_psendstat[],
         gen_pcontrolledexit[],
         gen_psenddata[],

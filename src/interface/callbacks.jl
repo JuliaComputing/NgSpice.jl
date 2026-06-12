@@ -5,7 +5,7 @@ function sendchar(_text::Ptr{Cchar}, id::Cint, userdata::Ptr{Cvoid})::Cint
     end
     push!(string_buffer,'\n')
          
-    #ccall(:uv_async_send, Cint, (Ptr{Cvoid},), async_cond[].handle)
+    ccall(:uv_async_send, Cint, (Ptr{Cvoid},), async_cond[].handle)
     return zero(Int32)
 end
 precompile(sendchar,(Ptr{Cchar},Cint,Ptr{Cvoid}))

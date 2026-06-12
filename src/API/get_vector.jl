@@ -1,4 +1,5 @@
 function get_vector_info(vecname, maxlen=Int(maxintfloat()))
+    GC.enable(false)
     factor = 1.0
     if occursin("*", vecname)
         factor, vecname = split(vecname, "*")
@@ -43,6 +44,7 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     else
         error("Unknown vector type")
     end
+    GC.enable(true)
 end
 
 function curplot()
