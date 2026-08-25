@@ -1,20 +1,21 @@
-# NgHerb -- A Revision of NgSpice
+# NgHerb.jl -- A Revision of NgSpice.jl
 
 
-This repository provides a Julia wrapper for NgSpice library. It's based on the 
-[NgSpice](https://github.com/JuliaComputing/NgSpice.jl) Julia module by Venkateshprasad Bhat. 
-NgHerb implements these changes:
+This repository provides a Julia wrapper for `ngspice` shared C library. It's based on the 
+[NgSpice.jl](https://github.com/JuliaComputing/NgSpice.jl) Julia module by Venkateshprasad Bhat. 
+NgHerb.jl implements these changes:
 
-* Thread safety for NgSpice callbacks, to resolve segfaults in Julia 12.6+
+* Thread safety for `ngspice` callbacks, to resolve segfaults in Julia 1.12.6+
 * Removed unused callbacks
-* Removed REPL and Plot features for easier maintenance
+* Removed some REPL and Plot features for easier maintenance
 
-NgHerb has some additional streamlining compared to NgSpice. 
+NgHerb.jl has some additional streamlining compared to NgSpice.jl 
 
-The main purpose is to provide a minimal `ngspice` library wrapper that works stably with more recent
-Julia versions. As of Julia 12.6, the original NgSpice module is broken unless
-Julia is constrained to one thread, i.e. `julia -t 1`. NgHerb tries to fix this by
-introducing a CircularBuffer to manage asyncrhonous output from the `ngspice`.
+The main purpose of this fork is to provide a minimal `ngspice` library wrapper that works stably with more recent
+Julia versions. As of Julia 1.12.6, the upstream NgSpice.jl module is broken unless
+Julia is constrained to one thread, i.e. `julia -t 1`. NgHerb.jl tries to fix this by
+introducing a CircularBuffer to manage asynchronous output from the `ngspice`. I made a fork rather than
+mess with NgSpice.jl directly, mainly because I'm not super confident about my solution.
 
 
 ## Usage:
