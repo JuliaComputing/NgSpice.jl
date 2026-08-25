@@ -1,8 +1,12 @@
 
 
 function cmd(command::String)
+    global quiet
     GC.enable(false)
     ngSpice_Command(command)
+    if !quiet
+        dumpbuffer()
+    end    
 end    
 precompile(cmd,(String,))
 

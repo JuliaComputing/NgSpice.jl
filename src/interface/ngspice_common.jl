@@ -17,7 +17,7 @@ const VF_PERMANENT = (1 << 7)
  Allows direct access to the ngspice internal vector structure,
  as defined in include/ngspice/devc.h .
 """
-struct vector_info
+struct VectorInfo
     name::Cstring              # Same as so_vname
     type::Cint 	               # Same as so_vtype
     flags::Int16               # Flags (a combination of VF_*)
@@ -26,9 +26,9 @@ struct vector_info
     length::Cint               # Length of the vector
 end
 
-const pvector_info = Ptr{vector_info}
+const pVectorInfo = Ptr{VectorInfo}
 
-struct vecvalues
+struct VecValues
     name::Cstring              # name of a specific vector
     creal::Cdouble             # actual data value
     cimag::Cdouble             # actual data value
@@ -36,17 +36,17 @@ struct vecvalues
     is_complex::Cint           # if the data are complex numbers
 end
 
-const pvecvalues = Ptr{vecvalues}
+const pVecValues = Ptr{VecValues}
 
-struct vecvaluesall
+struct VecValuesAll
     veccount::Cint         # number of vectors in plot
     vecindex::Cint         # index of actual set of vectors. i.e. the number of accepted data point
-    vecsa::pvecvalues # values of actual set of vectors, indexed from 0 to veccount - 1
-        #just pvecvalues?
+    vecsa::pVecValues # values of actual set of vectors, indexed from 0 to veccount - 1
+        #just pVecValues?
 end
 
-const pvecvaluesall = Ptr{vecvaluesall}
-struct vecinfo
+const pVecValuesAll = Ptr{VecValuesAll}
+struct VecInfo
     number::Cint           # number of vector, as postion in the linked list of vectors, s
     name::Cstring          # name of the actual vector
     is_real::Cint          # 1 if the actual vector has real data
@@ -54,16 +54,16 @@ struct vecinfo
     pdvecscale::Ptr{Cvoid} # a void pointer to struct dvec *ds, the scale vector
 
 end
-const pvecinfo = Ptr{vecinfo}
+const pVecInfo = Ptr{VecInfo}
 
 
-struct vecinfoall
+struct VecInfoAll
     name::Cstring
     title::Cstring
     date::Cstring
     type::Cstring
     veccount::Cint
-    vecs::pvecinfo
+    vecs::pVecInfo
 end
-const pvecinfoall = Ptr{vecinfoall}
+const pVecInfoAll = Ptr{VecInfoAll}
 

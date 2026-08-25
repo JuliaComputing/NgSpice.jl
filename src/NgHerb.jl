@@ -13,7 +13,7 @@ include("API/sim_utils.jl")
 include("API/running.jl")
 include("API/get_vector.jl")
 
-const async_cond    = Ref{Base.AsyncCondition}()
+#const async_cond    = Ref{Base.AsyncCondition}()
 string_buffer       = CircularBuffer{UInt8}(10000)
 
 # Callback pointers
@@ -27,12 +27,13 @@ const     gen_psendinitdata  = Ref{Ptr{Cvoid}}(C_NULL)
     
 pcbvec = Vector{Ref}()
 cbvec  = Vector{Function}()
+quiet  = false
 
-data_pointer = Ptr{vecinfoall}(0)
+data_pointer = Ptr{VecInfoAll}(0)
 
 function __init__()
     
-    async_cond[] = Base.AsyncCondition()
+  #  async_cond[] = Base.AsyncCondition()
 
     # We will just need these callbacks:
     gen_psendchar[]       = @cfunction(sendchar,       Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}                   ))
@@ -47,10 +48,13 @@ function __init__()
     end
 
 
-    callback_listener()
+#    callback_listener()
     init()
 end
 
+function be_quiet()
+    global quiet = true
+end
 
 
 function dumpbuffer()
@@ -69,13 +73,13 @@ function dumpbuffer()
 end
 
 
-
+#=
 function callback_listener()
     @async begin
         try
             while isopen(async_cond[])
                 wait(async_cond[])
-                dumpbuffer()
+                #dumpbuffer()
                 GC.enable(true)                
             end
         catch err
@@ -83,7 +87,7 @@ function callback_listener()
         end
     end
 end
-
+=#
 
 #================ Special Strings =====================#
 # ng"" sends the quoted command to the simulator
@@ -130,5 +134,6 @@ end
 
 
 export @ng_str, @real_str, @imag_str, @i_str, @magnitude_str, @dB_str, @phase_str, @vec_str
+export dump_buffer,be_quiet
 
 end

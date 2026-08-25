@@ -40,7 +40,7 @@ end
 # These functions are potentially unsafe due to passing String
 # to Csting on foreign thread
 function ngGet_Vec_Info(vecname)
-    ccall((:ngGet_Vec_Info, libngspice), pvector_info, (Cstring,), vecname)
+    ccall((:ngGet_Vec_Info, libngspice), pVectorInfo, (Cstring,), vecname)
 end
 
 
