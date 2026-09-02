@@ -1,12 +1,13 @@
 function get_vector_info(vecname, maxlen=Int(maxintfloat()))
+    GC.enable(false)
     factor = 1.0
     if occursin("*", vecname)
         factor, vecname = split(vecname, "*")
         factor = parse(Float64, factor)
     end
-    vec = ngGet_Vec_Info(vecname)
+    vec = ngGet_Vec_Info(vecname)  # returns pVectorInfo
     vec != C_NULL || throw("Vector $(vecname) not found")
-    vecinfo = unsafe_load(vec)
+    vecinfo = unsafe_load(vec)     # vecinfo should be a VectorInfo
     vname  = unsafe_string(vecinfo.name)
     len = min(maxlen, vecinfo.length)
     typelist = Dict(0 => "notype",
@@ -43,6 +44,7 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     else
         error("Unknown vector type")
     end
+    GC.enable(true)
 end
 
 function curplot()
@@ -97,7 +99,7 @@ function getmagnitudevec(name, maxlen=Int(maxintfloat()))
     abs.(data)
 end
 
-function getphasevec(name, maxlen=Int(maxintfloat))
+function getphasevec(name, maxlen=Int(maxintfloat()))
     _, __, data = get_vector_info(name, maxlen)
     angle.(data)
 end

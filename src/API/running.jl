@@ -1,34 +1,24 @@
-cmd(command) = ngSpice_Command(command)
+
+
+function cmd(command::String)
+    global quiet
+    GC.enable(false)
+    ngSpice_Command(command)
+    if !quiet
+        dumpbuffer()
+    end    
+end    
+precompile(cmd,(String,))
+
 
 function init()
-    pvoid = convert(Ptr{Nothing}, 0)
-    ngSpice_Init(gen_psendchar(), gen_psendstat(),
-        gen_pcontrolledexit(),
-        gen_psenddata(),
-        gen_psendinitdata(),
-        gen_pbgthread(), pvoid)
-    ngSpice_Init_JLExtensions(
-        @cfunction(path_resolve, Cstring, (Cstring, Cstring))
-    )
+    GC.enable(false)
+    ngSpice_Init(gen_psendchar[], gen_psendstat[],
+        gen_pcontrolledexit[],
+        gen_psenddata[],
+        gen_psendinitdata[],
+        gen_pbgthread[], C_NULL)
 
 end
 
-isrunning() = ngSpice_running() # always returns 0
 
-run()     = (println("Running the simulator"); cmd("run"))
-bgrun()   = (println("Running the simulator in a background thread");
-                cmd("bg_run"))
-
-set_breakpoint(bkpt::Float64) = ngSpice_SetBkpt(bkpt)
-
-stop()    = (println("Stopping the simulator"); cmd("stop"))
-bghalt()  = (println("Halting the simulator in a background thread");
-                cmd("bg_halt"))
-
-reset()   = (println("Resetting the simulator"); cmd("reset"))
-resume()  = (println("Resuming the simulator"); cmd("resume"))
-
-alter(command::String) = cmd(string("alter ", command))
-
-quit()    = cmd("quit")
-exit()    = (println("Quitting immediately"); cmd("unset askquit"); cmd("quit"))
