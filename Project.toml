@@ -1,6 +1,6 @@
 name = "NgHerb"
 uuid = "16d751f2-2168-46b0-9d00-9e1470832ba3"
-version = "0.2.1"
+version = "0.2.0"
 authors = ["Chris Winstead", "Venkateshprasad Bhat"]
 
 [deps]
