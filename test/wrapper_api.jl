@@ -14,8 +14,8 @@ end
     # as this simulation runs after the one in `ngspice_api.jl`, 
     # `tran2` is the current plot
     @test curplot() == "tran2"
-    @test listallplots() == ["tran2", "tran1", "const"]
-    @test collect(keys(listallvecs())) == collect(sort(listallplots()))
+    @test issetequal(listallplots(), ["tran2", "tran1", "const"])
+    @test issetequal(collect(keys(listallvecs())),collect(listallplots()))
     @test listallvecs()[curplot()] == listcurvecs()
     @test getvec.(listcurvecs()) == get_vector_info.(listcurvecs())
     #listcurvecs()

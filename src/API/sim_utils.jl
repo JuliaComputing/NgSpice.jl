@@ -1,6 +1,9 @@
 function load_netlist(netlist::AbstractArray{T}) where T <: AbstractString
-    append!(netlist, ["C_NULL"])
-    t = netlist |> ngSpice_Circ
+    # Each line must be its own NUL-terminated String: a SubString (e.g. from
+    # `split`) points into its parent string, so ngspice would read past the end
+    # of the line. Julia appends the terminating NULL pointer itself when it
+    # converts the Vector{String} for ccall. The caller's array is not modified.
+    ngSpice_Circ(String[String(l) for l in netlist])
 end
 
 function load_netlist(netlist::AbstractString)

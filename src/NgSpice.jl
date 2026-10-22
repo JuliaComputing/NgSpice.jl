@@ -9,6 +9,7 @@ using Requires
 include("interface/ctypes.jl")
 export Ctm, Ctime_t, Cclock_t
 
+include("interface/signals.jl")
 include("interface/ngspice_common.jl")
 include("interface/ngspice_api.jl")
 
@@ -31,6 +32,9 @@ include("API/sim_utils.jl")
 include("API/running.jl")
 
 function __init__()
+    # Snapshot Julia's own signal handlers before libngspice can modify them.
+    save_julia_signal_handlers!()
+
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" @eval include("API/repl.jl")
     @require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" @eval include("API/graphs.jl")
 

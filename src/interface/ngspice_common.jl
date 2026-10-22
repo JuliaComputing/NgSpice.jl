@@ -79,39 +79,57 @@ function std_print(text)
     println(text)
 end
 
+# Callbacks invoked by libngspice. They run inside an ngspice call (or on
+# ngspice's own thread after `bg_run`), so they must never throw: an exception
+# must not unwind through ngspice's C frames. They also must not call back into
+# ngspice or take NGSPICE_LOCK.
+
 function sendchar(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
-    _text != C_NULL || throw("Not a valid text")
-    text = unsafe_string(_text)
-    std_print(text)
-    occursin(r"stderr Error:"i, text) && (ngerrorf = 1)
-    return 0
+    try
+        _text == C_NULL && return Cint(0)
+        std_print(unsafe_string(_text))
+    catch
+    end
+    return Cint(0)
 end
 
 gen_psendchar() = @cfunction(sendchar, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
 
 function sendstat(_text::Ptr{Cchar}, id::Cint, userdata)::Cint
-    _text != C_NULL || throw("Not a valid text")
-    text = unsafe_string(_text)
-    std_print(text)
-    return 0
+    try
+        _text == C_NULL && return Cint(0)
+        std_print(unsafe_string(_text))
+    catch
+    end
+    return Cint(0)
 end
 
 gen_psendstat() = @cfunction(sendstat, Cint, (Ptr{Cchar}, Cint, Ptr{Cvoid}))
 
 function bgthreadrunning(run::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
-    bgrunning = run
-    run ? println("BG thread is not running") :
-        println("BG thread is running")
-    return 0
+    # ngspice passes true (non-zero) when the background thread has *stopped*.
+    try
+        run != 0 ? println("BG thread is not running") :
+                   println("BG thread is running")
+    catch
+    end
+    return Cint(0)
 end
 
 gen_pbgthread() = @cfunction(bgthreadrunning, Cint, (Cint, Cint, Ptr{Cvoid}))
 
 function controlledexit(exitstatus::Cint, immediate::Cint,
     quitexit::Cint, id::Cint, userdata::Ptr{Cvoid})::Cint
-    quitexit == 1 && println("Returned from quit with exit status")
-    immediate == 1 ? (println("Unloading NgSpice"); ngSpice_Command("quit")) :
-        (println("Prepare an unload"); will_unload = 1)
+    # ngspice cannot recover after calling this and asks to be unloaded.
+    # Record that, so later calls fail with an error instead of crashing.
+    # (Previously this called ngSpice_Command("quit") re-entrantly from inside
+    # ngspice's exit path.)
+    _ngspice_exit[] = (exitstatus, quitexit)
+    try
+        quitexit == 1 ? println("Returned from quit with exit status $exitstatus") :
+                        println("NgSpice requested to be unloaded (exit status $exitstatus)")
+    catch
+    end
     return exitstatus
 end
 

@@ -13,3 +13,7 @@ end
 @safetestset "wrapper safetests" begin
     include("wrapper_safetests.jl")
 end
+
+@safetestset "signal handlers" begin
+    include("signals.jl")
+end

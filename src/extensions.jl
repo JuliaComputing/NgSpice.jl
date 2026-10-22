@@ -7,7 +7,7 @@ function c_strdup(str)
 	ptr
 end
 
-function path_resolve(name::Cstring, dir::Cstring)::Cstring
+function _path_resolve(name::Cstring, dir::Cstring)::Cstring
     name = unsafe_string(name)
     dir = unsafe_string(dir)
 
@@ -27,4 +27,13 @@ function path_resolve(name::Cstring, dir::Cstring)::Cstring
         return Ptr{Cchar}(-1)
     end
     return C_NULL
+end
+
+# Called by ngspice as a C callback: must never throw.
+function path_resolve(name::Cstring, dir::Cstring)::Cstring
+    try
+        return _path_resolve(name, dir)
+    catch
+        return Ptr{Cchar}(-1)
+    end
 end

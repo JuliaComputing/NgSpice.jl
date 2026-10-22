@@ -1,4 +1,11 @@
-function get_vector_info(vecname, maxlen=Int(maxintfloat()))
+# These read memory owned by ngspice (vector data, name lists) right after the
+# raw call that returned it, so they hold NGSPICE_LOCK for the whole operation.
+get_vector_info(args...) = lock(() -> _get_vector_info(args...), NGSPICE_LOCK)
+curplot() = lock(_curplot, NGSPICE_LOCK)
+listallplots(args...) = lock(() -> _listallplots(args...), NGSPICE_LOCK)
+listcurvecs(args...) = lock(() -> _listcurvecs(args...), NGSPICE_LOCK)
+
+function _get_vector_info(vecname, maxlen=Int(maxintfloat()))
     factor = 1.0
     if occursin("*", vecname)
         factor, vecname = split(vecname, "*")
@@ -45,13 +52,13 @@ function get_vector_info(vecname, maxlen=Int(maxintfloat()))
     end
 end
 
-function curplot()
+function _curplot()
     cur = ngSpice_CurPlot()
     cur != C_NULL || throw("No current plots")
     unsafe_string(cur)
 end
 
-function listallplots(nplots=Int(maxintfloat()))
+function _listallplots(nplots=Int(maxintfloat()))
     ppallplots = ngSpice_AllPlots()
     pallplots = unsafe_wrap(Array, ppallplots, nplots)
     allplots = String[]
@@ -62,7 +69,7 @@ function listallplots(nplots=Int(maxintfloat()))
     end
 end
 
-function listcurvecs(plot=curplot(), nvecs=Int(maxintfloat()))
+function _listcurvecs(plot=curplot(), nvecs=Int(maxintfloat()))
     ppcurvecs = ngSpice_AllVecs(plot)
     pcurvecs = unsafe_wrap(Array, ppcurvecs, nvecs)
     curvecs = String[]
@@ -97,7 +104,7 @@ function getmagnitudevec(name, maxlen=Int(maxintfloat()))
     abs.(data)
 end
 
-function getphasevec(name, maxlen=Int(maxintfloat))
+function getphasevec(name, maxlen=Int(maxintfloat()))
     _, __, data = get_vector_info(name, maxlen)
     angle.(data)
 end
