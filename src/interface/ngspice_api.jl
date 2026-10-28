@@ -1,53 +1,28 @@
+# Raw libngspice entry points. None of these are thread-safe or re-entrant;
+# call them only through the locked wrappers in src/API.
+
 function ngSpice_Init(printfcn, statfcn, ngexit, sdata, sinitdata, bgtrun, userData)
-    ccall((:ngSpice_Init, libngspice), Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}), printfcn, statfcn, ngexit, sdata, sinitdata, bgtrun, userData)
+    ccall((:ngSpice_Init, libngspice), Cint,
+          (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}),
+          printfcn, statfcn, ngexit, sdata, sinitdata, bgtrun, userData)
 end
 
-function ngSpice_Init_JLExtensions(path_resolve)
-    ret = try;
-        ccall((:ngSpice_Init_JLExtensions, libngspice), Cint, (Cint, Ptr{Cvoid},),
-            1, path_resolve)
-    catch e;
-        @warn "Failed to initialize julia extensions. Some features may not work."
-        return false
-    end
-    if ret != 0
-        error("Failed to initialize julia extensions")
-    end
-    return true
+# ngspice copies the command, and ccall keeps `command` alive for the duration
+# of the call, so a Cstring argument is sufficient (no malloc copy needed).
+function ngSpice_Command(command::AbstractString)
+    @ccall libngspice.ngSpice_Command(command::Cstring)::Cint
 end
 
-function ngSpice_Init_Sync(vsrcdat, isrcdat, syncdat, ident, userData)
-    ccall((:ngSpice_Init_Sync, libngspice), Cint, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cint}, Ptr{Cvoid}), vsrcdat, isrcdat, syncdat, ident, userData)
-end
+ngSpice_CurPlot()  = ccall((:ngSpice_CurPlot, libngspice), Ptr{UInt8}, ())
+ngSpice_AllPlots() = ccall((:ngSpice_AllPlots, libngspice), Ptr{Ptr{UInt8}}, ())
 
-function ngSpice_Command(command)
-    ccall((:ngSpice_Command, libngspice), Cint, (Cstring,), command)
-end
+ngGet_Vec_Info(vecname::AbstractString) =
+    ccall((:ngGet_Vec_Info, libngspice), pVectorInfo, (Cstring,), vecname)
 
-function ngGet_Vec_Info(vecname)
-    ccall((:ngGet_Vec_Info, libngspice), pvector_info, (Cstring,), vecname)
-end
-
-function ngSpice_Circ(circarray)
-    ccall((:ngSpice_Circ, libngspice), Cint, (Ptr{Ptr{UInt8}},), circarray)
-end
-
-function ngSpice_CurPlot()
-    ccall((:ngSpice_CurPlot, libngspice), Ptr{UInt8}, ())
-end
-
-function ngSpice_AllPlots()
-    ccall((:ngSpice_AllPlots, libngspice), Ptr{Ptr{UInt8}}, ())
-end
-
-function ngSpice_AllVecs(plotname)
+ngSpice_AllVecs(plotname::AbstractString) =
     ccall((:ngSpice_AllVecs, libngspice), Ptr{Ptr{UInt8}}, (Cstring,), plotname)
-end
 
-function ngSpice_running()
-    ccall((:ngSpice_running, libngspice), Cint, ())
-end
-
-function ngSpice_SetBkpt(bkpt)
-    ccall((:ngSpice_SetBkpt, libngspice), Cint, (Cdouble,), bkpt)
-end
+# Julia converts a Vector{String} to a NULL-terminated char** for this call
+# and keeps the strings alive until it returns; ngspice copies the lines.
+ngSpice_Circ(lines::Vector{String}) =
+    ccall((:ngSpice_Circ, libngspice), Cint, (Ptr{Ptr{UInt8}},), lines)
